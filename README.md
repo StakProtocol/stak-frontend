@@ -21,7 +21,7 @@ A modern web3 application for launching and managing Flying ICOs and Stak Vaults
 ### Installation
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### Environment Variables
@@ -40,7 +40,7 @@ NEXT_PUBLIC_SEPOLIA_RPC=https://eth-sepolia.g.alchemy.com/v2/xIr38p6GdYSjklWQISO
 ### Running the Development Server
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -75,8 +75,3 @@ The application uses The Graph indexer at:
 - Endpoint: `https://api.studio.thegraph.com/query/69146/stak-protocol/version/latest`
 - API Key: Configured in `lib/graphql.ts`
 
-## Learn More
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Wagmi Documentation](https://wagmi.sh)
-- [The Graph Documentation](https://thegraph.com/docs)

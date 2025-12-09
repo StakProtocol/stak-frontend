@@ -1,22 +1,73 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Manrope, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const dmSansMono = DM_Sans({
   subsets: ["latin"],
+  weight: "300",
+  variable: "--font-dm-sans-mono",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const manrope = Manrope({
   subsets: ["latin"],
+  variable: "--font-manrope",
 });
 
-export const metadata: Metadata = {
+const common = {
   title: "Stak Protocol - Launch Your DeFi Products",
   description: "Launch and manage Flying ICOs and Stak Vaults",
-};
+  image: '/images/logo-wordmark-white.png'
+}
+
+export const metadata: Metadata = {
+  title: common.title,
+  description: common.description,
+  metadataBase: new URL("https://www.stak.fund/"),
+  applicationName: "Stak",
+  alternates: {
+    canonical: "https://www.stak.fund/",
+  },
+  icons: {
+    icon: [
+      { rel: "icon", url: "/icons/favicon.ico", type: "image/svg+xml" },
+      {
+        url: "/icons/favicon-32x32.png",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/icons/favicon-32x32.png",
+        media: "(prefers-color-scheme: dark)",
+      },
+      {
+        rel: "apple-touch-icon",
+        url: "/icons/apple-touch-icon.png",
+      }
+    ],
+  },
+  manifest: "/icons/manifest.json",
+  openGraph: {
+    type: "website",
+    url: "https://www.stak.fund/",
+    title: common.title,
+    description: common.description,
+    siteName: "Stak",
+    images: common.image,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: common.title,
+    description: common.description,
+    site: "@stakfund",
+    creator: "@stakfund",
+    images: common.image,
+  },
+  appleWebApp: {
+    capable: true,
+    title: common.title,
+    statusBarStyle: "default",
+  },
+}
 
 export default function RootLayout({
   children,
@@ -25,9 +76,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${dmSansMono.variable} ${manrope.variable} antialiased`}>
         <Providers>
           {children}
         </Providers>

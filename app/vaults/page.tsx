@@ -31,6 +31,7 @@ export default function VaultsPage() {
     async function fetchVaults() {
       try {
         const data = await graphqlClient.request<{ stakVaults: StakVault[] }>(GET_STAK_VAULTS);
+        console.log(data);
         setVaults(data.stakVaults);
       } catch (error) {
         console.error('Error fetching vaults:', error);
@@ -45,10 +46,10 @@ export default function VaultsPage() {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  const formatNumber = (value: string) => {
+  const formatNumber = (value: string, decimals: number = 18) => {
     return new Intl.NumberFormat('en-US', {
       maximumFractionDigits: 2,
-    }).format(parseFloat(value) / 1e18);
+    }).format(parseFloat(value) / 10 ** decimals);
   };
 
   return (
@@ -100,7 +101,7 @@ export default function VaultsPage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-400">Total Assets:</span>
-                      <span className="font-medium text-gray-900 dark:text-white">{formatNumber(vault.totalAssets)}</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{formatNumber(vault.totalAssets, 6)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-400">Invested:</span>
@@ -116,7 +117,7 @@ export default function VaultsPage() {
                           NAV Enabled
                         </span>
                       )}
-                      <span className="text-xs text-gray-500 dark:text-gray-400 font-mono ml-auto">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         {formatAddress(vault.id)}
                       </span>
                     </div>

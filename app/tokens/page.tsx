@@ -42,10 +42,10 @@ export default function TokensPage() {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  const formatNumber = (value: string) => {
+  const formatNumber = (value: string, decimals: number = 18) => {
     return new Intl.NumberFormat('en-US', {
       maximumFractionDigits: 2,
-    }).format(parseFloat(value) / 1e18);
+    }).format(parseFloat(value) / 1 ** decimals);
   };
 
   return (
@@ -94,10 +94,10 @@ export default function TokensPage() {
                     </div>
                   </div>
                   
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-2 text-sm mt-2">
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-400">Token Cap:</span>
-                      <span className="font-medium text-gray-900 dark:text-white">{formatNumber(ico.tokenCap)}</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{formatNumber(ico.tokenCap, 0)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-400">Total Assets:</span>
@@ -108,7 +108,7 @@ export default function TokensPage() {
                       <span className="font-medium text-gray-900 dark:text-white">{ico.positionCount}</span>
                     </div>
                     <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                      <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         {formatAddress(ico.id)}
                       </span>
                     </div>

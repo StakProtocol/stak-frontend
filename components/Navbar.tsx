@@ -1,45 +1,167 @@
 'use client';
 
 import Link from 'next/link';
-import { WalletButton } from './WalletButton';
+import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useChainId } from 'wagmi';
 
+import { ConnectButton } from "thirdweb/react";
+import { createWallet } from "thirdweb/wallets";
+import { createThirdwebClient, defineChain } from "thirdweb";
+import { NETWORK_ID, RPC_URL, THIRDWEB_CLIENT_ID } from '@/utils/constants';
+
+const client = createThirdwebClient({ clientId: THIRDWEB_CLIENT_ID });
+const customChain = defineChain({
+    id: NETWORK_ID,
+    name: "Sepolia Ethereum",
+    rpc: RPC_URL,
+    nativeCurrency: {
+        name: "ETH",
+        symbol: "ETH",
+        decimals: 18
+    }
+})
+
 export function Navbar() {
+  const pathname = usePathname();
   const chainId = useChainId();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const navigation = [
+    { name: 'Flying ICOs', href: '/tokens' },
+    { name: 'Stak Vaults', href: '/vaults' },
+  ];
 
   return (
     <nav className="w-full border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-black/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
-              Stak Protocol
-            </Link>
-            <div className="hidden md:flex gap-6">
-              <Link
-                href="/tokens"
-                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-              >
-                Flying ICOs
-              </Link>
-              <Link
-                href="/vaults"
-                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-              >
-                Stak Vaults
+        <div className="flex justify-between h-16">
+          <div className="flex">
+            <div className="flex-shrink-0 flex items-center">
+              <Link href="/" className="flex items-center">
+                <img
+                  className="object-cover w-fit h-10"
+                  src="/images/logo-wordmark-white.png"
+                  alt="Stak Protocol Logo"
+                />
               </Link>
             </div>
+
+            {/* Desktop Navigation Links */}
+            <div className="hidden md:ml-8 md:flex md:space-x-4">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`inline-flex items-center px-3 py-2 text-lg font-medium rounded-md transition-colors
+                    ${pathname === item.href
+                      ? 'text-gray-900 dark:text-white underline'
+                      : 'text-gray-600 dark:text-white dark:hover:text-gray-400'
+                    }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-4">
+
+          {/* Desktop Wallet Connect Button and Testnet Badge */}
+          <div className="hidden md:flex md:items-center md:gap-4">
             {chainId === 11155111 && (
-              <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 text-xs font-medium rounded-full">
+              <div className="px-4 py-1 dark:bg-blue-300/30 text-blue-800 dark:text-blue-200 text-md font-medium rounded-full">
+                <span className='w-2 h-2 rounded-full inline-flex mr-2 bg-blue-200'></span>
                 Sepolia Testnet
-              </span>
+              </div>
             )}
-            <WalletButton />
+            <ConnectButton
+              client={client}
+              chain={customChain}
+              chains={[customChain]}
+              wallets={[
+                createWallet("io.metamask"),
+                createWallet("com.coinbase.wallet"),
+                createWallet("me.rainbow"),
+              ]}
+            />
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="flex items-center md:hidden">
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <span className="sr-only">Open main menu</span>
+              {/* Icon when menu is closed */}
+              {!isMobileMenuOpen ? (
+                <svg
+                  className="block h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="block h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden">
+          <div className="pt-2 pb-3 space-y-1">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`block px-3 py-2 text-base font-medium ${pathname === item.href
+                  ? 'text-gray-900 dark:text-white underline'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+          <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-800">
+            <div className="px-3 space-y-3 right">
+              <ConnectButton
+                client={client}
+                chain={customChain}
+                chains={[customChain]}
+                wallets={[
+                  createWallet("io.metamask"),
+                  createWallet("com.coinbase.wallet"),
+                  createWallet("me.rainbow"),
+                ]}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
