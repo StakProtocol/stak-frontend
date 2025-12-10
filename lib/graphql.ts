@@ -1,7 +1,7 @@
 import { GraphQLClient } from 'graphql-request';
 
-const GRAPHQL_ENDPOINT = 'https://api.studio.thegraph.com/query/69146/stak-protocol/version/latest';
-const API_KEY = 'b7fcac0c276618677075c21d7ad7e496';
+const GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || '';
+const API_KEY = process.env.NEXT_PUBLIC_GRAPHQL_API_KEY || '';
 
 export const graphqlClient = new GraphQLClient(GRAPHQL_ENDPOINT, {
   headers: API_KEY ? {
