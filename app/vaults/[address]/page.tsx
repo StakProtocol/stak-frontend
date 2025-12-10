@@ -115,7 +115,7 @@ export default function VaultDetailPage() {
   // Pie chart data
   const pieData = vault ? [
     {
-      name: 'Contract Assets',
+      name: 'Vault Assets',
       value: formatNumber(vault.totalAssets, vault.decimals),
     },
     {
@@ -131,9 +131,12 @@ export default function VaultDetailPage() {
   // Shares distribution data
   const sharesData = vault ? (() => {
     // Calculate shares held by vault (locked shares in positions)
-    const sharesLocked = 0.9;
+    const totalShares = formatNumber(vault.totalShares, vault.decimals);
+    const sharesUnlocked = formatNumber(vault.totalSharesUnlocked, vault.decimals);
+    const sharesVested = totalShares * (1 - vestingRate);
+    const sharesLocked = totalShares - sharesUnlocked - sharesVested;
     // Shares not held by vault (unlocked/released shares)
-    const sharesUnlocked = totalShares - sharesLocked - sharesVested;
+    
 
     return [
       {
