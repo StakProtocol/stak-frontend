@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
 import { graphqlClient, GET_STAK_VAULT } from '@/lib/graphql';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, BarChart, Bar } from 'recharts';
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
+import { chainByID } from '@/app/utils/chains';
 
 interface StakPosition {
   id: string;
@@ -46,8 +47,12 @@ export default function VaultDetailPage() {
   const params = useParams();
   const address = params.address as string;
   const { address: userAddress, isConnected } = useAccount();
+  const chainId = useChainId();
   const [vault, setVault] = useState<StakVault | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  const currentChain = chainByID(chainId);
+  const blockExplorerUrl = currentChain.blockExplorerUrl;
 
   useEffect(() => {
     async function fetchVault() {
@@ -69,8 +74,8 @@ export default function VaultDetailPage() {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
 
-  const formatNumber = (value: string) => {
-    const num = parseFloat(value) / 1e18;
+  const formatNumber = (value: string, decimals: number = 18) => {
+    const num = parseFloat(value) / 10 ** decimals; // TODO: fetch from indexer or contract address
     return new Intl.NumberFormat('en-US', {
       maximumFractionDigits: 4,
     }).format(num);
@@ -80,49 +85,21 @@ export default function VaultDetailPage() {
     return new Date(parseInt(timestamp) * 1000).toLocaleDateString();
   };
 
-  // Calculate utilization rate
-  const utilizationRate = vault && parseFloat(vault.totalAssets) > 0
-    ? (parseFloat(vault.investedAssets) / parseFloat(vault.totalAssets)) * 100
-    : 0;
-
   // Pie chart data
   const pieData = vault ? [
     {
-      name: 'Total Assets',
-      value: parseFloat(vault.totalAssets) / 1e18,
+      name: 'Contract Assets',
+      value: parseFloat(formatNumber(vault.totalAssets, 6)),
     },
     {
       name: 'Invested Assets',
-      value: parseFloat(vault.investedAssets) / 1e18,
+      value: parseFloat(formatNumber(vault.investedAssets, 6)),
     },
     {
       name: 'Performance Fees',
-      value: parseFloat(vault.totalPerformanceFees) / 1e18,
+      value: parseFloat(formatNumber(vault.totalPerformanceFees, 4)),
     },
   ] : [];
-
-  // Vesting schedule data
-  const vestingData = vault ? (() => {
-    const start = parseInt(vault.vestingStart);
-    const end = parseInt(vault.vestingEnd);
-    const duration = end - start;
-    const steps = 10;
-    const step = duration / steps;
-    
-    return Array.from({ length: steps + 1 }, (_, i) => {
-      const time = start + step * i;
-      const unlocked = vault.positions.reduce((sum, pos) => {
-        const vestingProgress = Math.min(1, Math.max(0, (time - parseInt(pos.createdAt)) / (end - parseInt(pos.createdAt))));
-        return sum + (parseFloat(pos.sharesUnlocked) / 1e18);
-      }, 0);
-      
-      return {
-        time: formatDate(time.toString()),
-        unlocked,
-        locked: vault.positions.reduce((sum, pos) => sum + parseFloat(pos.shareAmount) / 1e18, 0) - unlocked,
-      };
-    });
-  })() : [];
 
   const userPositions = vault?.positions.filter(pos => 
     isConnected && pos.user.toLowerCase() === userAddress?.toLowerCase()
@@ -154,6 +131,60 @@ export default function VaultDetailPage() {
     );
   }
 
+  const totalAssets = parseFloat(formatNumber(vault.totalAssets, 6)) + parseFloat(formatNumber(vault.investedAssets, 6)) - parseFloat(formatNumber(vault.totalPerformanceFees, 4));
+  const investedAssets = parseFloat(formatNumber(vault.investedAssets, 6));
+  const performanceFees = parseFloat(formatNumber(vault.totalPerformanceFees, 4));
+  // Calculate utilization rate
+  const utilizationRate = totalAssets > 0 ? (investedAssets / totalAssets) * 100 : 0;
+
+  const vestingRate = (parseInt(vault.vestingEnd) - (new Date().getTime() / 1000)) / (parseInt(vault.vestingEnd) - parseInt(vault.vestingStart));
+  const totalShares = totalAssets; // TODO: change to totalShares
+  const vestedShares = totalAssets * (1 - vestingRate); // TODO: change to totalShares
+
+  // console.log('VESTING RATE:', vestingRate);
+
+  // Vesting schedule data
+  const vestingData = (() => {
+    const start = parseInt(vault.vestingStart);
+    const end = parseInt(vault.vestingEnd);
+    
+    // Calculate time range: 1 month before start to 1 month after end
+    const oneMonthInSeconds = 30 * 24 * 60 * 60;
+    const chartStart = start - oneMonthInSeconds;
+    const chartEnd = end + oneMonthInSeconds;
+    const totalDuration = chartEnd - chartStart;
+    
+    // Generate data points (50 points for smooth line)
+    const steps = 50;
+    const step = totalDuration / steps;
+    
+    return Array.from({ length: steps + 1 }, (_, i) => {
+      const time = chartStart + step * i;
+      
+      // Calculate vesting rate using the formula from lines 163-165
+      let vestingRate = 0;
+      if (time < start) {
+        // Before vesting starts: nothing is vested
+        vestingRate = 1;
+      } else if (time > end) {
+        // After vesting ends: everything is vested
+        vestingRate = 0;
+      } else {
+        // During vesting period
+        vestingRate = (end - time) / (end - start);
+      }
+      
+      // Calculate vested shares: totalShares * (1 - vestingRate)
+      const vestedShares = totalShares * (1 - vestingRate);
+      
+      return {
+        time: new Date(time * 1000).toLocaleDateString(),
+        timestamp: time,
+        vestedShares: vestedShares,
+      };
+    });
+  })();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
       <Navbar />
@@ -170,18 +201,25 @@ export default function VaultDetailPage() {
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-500 dark:text-gray-400">Contract</p>
-              <p className="text-sm font-mono text-gray-900 dark:text-white">{formatAddress(vault.id)}</p>
+              <a
+                href={`${blockExplorerUrl}/address/${vault.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-mono text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+              >
+                {formatAddress(vault.id)}
+              </a>
             </div>
           </div>
 
           <div className="grid md:grid-cols-4 gap-6 mb-8">
             <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Assets</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(vault.totalAssets)}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalAssets.toFixed(2)}</p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Invested Assets</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(vault.investedAssets)}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{investedAssets.toFixed(2)}</p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Utilization Rate</p>
@@ -196,27 +234,52 @@ export default function VaultDetailPage() {
           {/* Pie Chart */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Asset Distribution</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value: number) => formatNumber((value * 1e18).toString())} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+            <div className="flex items-center h-64 gap-2">
+              {/* Pie Chart */}
+              <div className="h-full shrink-0" style={{ width: '256px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: number) => formatNumber((value * 1e18).toString())} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              {/* Custom Legend on the right */}
+              <div className="flex flex-col gap-3 shrink-0">
+                {pieData.map((entry, index) => {
+                  const total = pieData.reduce((sum, item) => sum + item.value, 0);
+                  const percent = total > 0 ? (entry.value / total) * 100 : 0;
+                  return (
+                    <div key={`legend-${index}`} className="flex items-center gap-3">
+                      <div
+                        className="w-4 h-4 rounded shrink-0"
+                        style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                      />
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {entry.name}
+                        </span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {percent.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -227,31 +290,30 @@ export default function VaultDetailPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={vestingData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="unlocked" stroke="#8b5cf6" name="Unlocked Shares" />
-                  <Line type="monotone" dataKey="locked" stroke="#ec4899" name="Locked Shares" />
+                  <XAxis 
+                    dataKey="time" 
+                    tick={{ fontSize: 12 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis 
+                    label={{ value: 'Vested Shares', angle: -90, position: 'insideLeft' }}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => value.toFixed(2)}
+                    labelFormatter={(label) => `Date: ${label}`}
+                  />
+                  <Line 
+                    type="linear" 
+                    dataKey="vestedShares" 
+                    stroke="#8b5cf6" 
+                    strokeWidth={2}
+                    dot={false}
+                    name="Vested Shares"
+                  />
                 </LineChart>
               </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Backing Assets vs Contract Balances */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Backing Assets vs Contract Balances</h2>
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Backing Balance</p>
-                  <p className="text-xl font-bold text-gray-900 dark:text-white">{formatNumber(vault.totalAssets)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Contract Balance</p>
-                  <p className="text-xl font-bold text-gray-900 dark:text-white">{formatNumber(vault.totalAssets)}</p>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -262,29 +324,37 @@ export default function VaultDetailPage() {
               <div className="space-y-4">
                 {userPositions.map((position) => (
                   <div key={position.id} className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
-                    <div className="grid md:grid-cols-5 gap-4 text-sm">
+                    <div className="grid md:grid-cols-6 gap-4 text-sm">
                       <div>
                         <p className="text-gray-600 dark:text-gray-400">Position ID</p>
                         <p className="font-medium text-gray-900 dark:text-white">{position.positionId}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400">Share Amount</p>
-                        <p className="font-medium text-gray-900 dark:text-white">{formatNumber(position.shareAmount)}</p>
+                        <p className="text-gray-600 dark:text-gray-400">Assets</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{formatNumber(position.assetAmount, 6)}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400">Unlocked</p>
-                        <p className="font-medium text-gray-900 dark:text-white">{formatNumber(position.sharesUnlocked)}</p>
+                        <p className="text-gray-600 dark:text-gray-400">Shares</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{formatNumber(position.shareAmount, 6)}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400">Released</p>
-                        <p className="font-medium text-gray-900 dark:text-white">{formatNumber(position.assetsReleased)}</p>
+                        <p className="text-gray-600 dark:text-gray-400">Assets Divested</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{formatNumber(position.assetsReleased, 6)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400">Shares Unlocked</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{formatNumber(position.sharesUnlocked, 6)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400">Divestible Shares</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{parseFloat(formatNumber(position.shareAmount, 6)) * vestingRate}</p>
                       </div>
                       <div className="flex gap-2">
-                        <button className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm">
+                        <button className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm cursor-pointer">
                           Divest
                         </button>
-                        <button className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm">
-                          Withdraw
+                        <button className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm cursor-pointer">
+                          Unlock
                         </button>
                       </div>
                     </div>
@@ -315,13 +385,13 @@ export default function VaultDetailPage() {
                         {formatAddress(position.user)}
                       </td>
                       <td className="py-3 px-4 text-sm text-right text-gray-900 dark:text-white">
-                        {formatNumber(position.assetAmount)}
+                        {formatNumber(position.assetAmount, 6)}
                       </td>
                       <td className="py-3 px-4 text-sm text-right text-gray-900 dark:text-white">
-                        {formatNumber(position.shareAmount)}
+                        {formatNumber(position.shareAmount, 6)}
                       </td>
                       <td className="py-3 px-4 text-sm text-right text-gray-900 dark:text-white">
-                        {formatNumber(position.sharesUnlocked)}
+                        {formatNumber(position.sharesUnlocked, 6)}
                       </td>
                       <td className="py-3 px-4 text-sm text-center">
                         {position.isClosed ? (
