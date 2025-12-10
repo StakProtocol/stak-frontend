@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
 import { useAccount } from 'wagmi';
-import { writeContract, waitForTransaction } from '@wagmi/core';
+import { writeContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config } from '@/lib/wagmi';
 import { parseEther } from 'viem';
 import FactoryStakVaultABI from '@/app/abis/FactoryStakVault.json';
@@ -63,7 +63,7 @@ export default function NewVaultPage() {
         ],
       });
 
-      await waitForTransaction(config, { hash });
+      await waitForTransactionReceipt(config, { hash });
       router.push('/vaults');
     } catch (error) {
       console.error('Error creating vault:', error);

@@ -7,7 +7,7 @@ import { Navbar } from '@/components/Navbar';
 import { graphqlClient, GET_FLYING_ICO } from '@/lib/graphql';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { useAccount } from 'wagmi';
-import { readContract, writeContract, waitForTransaction } from '@wagmi/core';
+import { readContract, writeContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config } from '@/lib/wagmi';
 import { parseEther, formatEther } from 'viem';
 import FlyingICOABI from '@/app/abis/FlyingICO.json';
@@ -140,7 +140,7 @@ export default function TokenDetailPage() {
       //   functionName: 'investERC20',
       //   args: [selectedAsset, parseEther(investAmount)],
       // });
-      // await waitForTransaction(config, { hash });
+      // await waitForTransactionReceipt(config, { hash });
       alert('Investment functionality needs contract addresses configured');
     } catch (error) {
       console.error('Investment error:', error);
