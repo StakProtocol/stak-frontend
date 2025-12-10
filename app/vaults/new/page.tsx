@@ -75,11 +75,11 @@ export default function NewVaultPage() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
         <Navbar />
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center">
-            <p className="text-gray-600 dark:text-gray-400 mb-4">Please connect your wallet to create a new vault</p>
+          <div className="text-center py-12 bg-white dark:bg-dark-primary rounded-2xl shadow-lg">
+            <p className="text-gray-600 font-medium dark:text-gray-200 my-2">Please connect your wallet to create a new vault</p>
           </div>
         </div>
       </div>
@@ -87,14 +87,14 @@ export default function NewVaultPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/vaults" className="text-purple-600 hover:text-purple-700 mb-4 inline-block">
+        <Link href="/vaults" className="text-primary hover:text-primary/70 mb-4 inline-block">
           ← Back to Vaults
         </Link>
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+        <div className="bg-white dark:bg-dark-primary rounded-2xl shadow-lg p-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Launch New Stak Vault</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -216,7 +216,7 @@ export default function NewVaultPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors"
+              className="w-full px-6 py-3 bg-dark-primary/30 border border-red hover:bg-dark-primary text-primary font-semibold rounded-lg font-medium transition-colors cursor-pointer"
             >
               {loading ? 'Creating Vault...' : 'Launch Vault'}
             </button>

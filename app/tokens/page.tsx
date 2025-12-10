@@ -45,7 +45,7 @@ export default function TokensPage() {
   const formatNumber = (value: string, decimals: number = 18) => {
     return new Intl.NumberFormat('en-US', {
       maximumFractionDigits: 2,
-    }).format(parseFloat(value) / 1 ** decimals);
+    }).format(parseFloat(value) / 10 ** decimals);
   };
 
   return (

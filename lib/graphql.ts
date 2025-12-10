@@ -69,18 +69,11 @@ export const GET_STAK_VAULTS = `
       asset
       name
       symbol
-      owner
-      treasury
-      performanceRate
-      vestingStart
-      vestingEnd
+      decimals
       totalAssets
       investedAssets
-      totalPerformanceFees
       redeemsAtNavEnabled
       positionCount
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -92,15 +85,18 @@ export const GET_STAK_VAULT = `
       asset
       name
       symbol
+      decimals
       owner
       treasury
       performanceRate
       vestingStart
       vestingEnd
+      redeemsAtNavEnabled
+      totalPerformanceFees
       totalAssets
       investedAssets
-      totalPerformanceFees
-      redeemsAtNavEnabled
+      totalShares
+      totalSharesUnlocked
       positionCount
       createdAt
       updatedAt
@@ -110,10 +106,8 @@ export const GET_STAK_VAULT = `
         user
         assetAmount
         shareAmount
-        sharesBurned
         sharesUnlocked
-        assetsReturned
-        assetsReleased
+        assetsDivested
         isClosed
         createdAt
         updatedAt
@@ -121,4 +115,3 @@ export const GET_STAK_VAULT = `
     }
   }
 `;
-

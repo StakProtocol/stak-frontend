@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useChainId } from 'wagmi';
@@ -33,16 +34,18 @@ export function Navbar() {
   ];
 
   return (
-    <nav className="w-full border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-black/80 backdrop-blur-sm sticky top-0 z-50">
+    <nav className="w-full border-b border-gray-200 dark:border-primary bg-white/80 dark:bg-black/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center">
-                <img
+                <Image
                   className="object-cover w-fit h-10"
                   src="/images/logo-wordmark-white.png"
                   alt="Stak Protocol Logo"
+                  width={100}
+                  height={50}
                 />
               </Link>
             </div>
@@ -56,7 +59,7 @@ export function Navbar() {
                   className={`inline-flex items-center px-3 py-2 text-lg font-medium rounded-md transition-colors
                     ${pathname === item.href
                       ? 'text-gray-900 dark:text-white underline'
-                      : 'text-gray-600 dark:text-white dark:hover:text-gray-400'
+                      : 'text-gray-600 dark:text-white dark:hover:text-primary'
                     }`}
                 >
                   {item.name}
@@ -68,9 +71,8 @@ export function Navbar() {
           {/* Desktop Wallet Connect Button and Testnet Badge */}
           <div className="hidden md:flex md:items-center md:gap-4">
             {chainId === 11155111 && (
-              <div className="px-4 py-1 dark:bg-blue-300/30 text-blue-800 dark:text-blue-200 text-md font-medium rounded-full">
-                <span className='w-2 h-2 rounded-full inline-flex mr-2 bg-blue-200'></span>
-                Sepolia Testnet
+              <div className="px-4 py-1 dark:bg-primary/20 text-blue-800 dark:text-[#19a5ba] text-md font-medium rounded-full">
+                <span>Sepolia Testnet</span>
               </div>
             )}
             <ConnectButton
@@ -138,7 +140,7 @@ export function Navbar() {
                 href={item.href}
                 className={`block px-3 py-2 text-base font-medium ${pathname === item.href
                   ? 'text-gray-900 dark:text-white underline'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  : 'text-gray-600 dark:text-white dark:hover:text-primary'
                   }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -146,7 +148,7 @@ export function Navbar() {
               </Link>
             ))}
           </div>
-          <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-800">
+          <div className="pt-4 pb-3 border-t border-gray-200 dark:border-primary">
             <div className="px-3 space-y-3 right">
               <ConnectButton
                 client={client}
