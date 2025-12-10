@@ -85,22 +85,6 @@ export default function VaultDetailPage() {
     return new Date(parseInt(timestamp) * 1000).toLocaleDateString();
   };
 
-  // Pie chart data
-  const pieData = vault ? [
-    {
-      name: 'Contract Assets',
-      value: parseFloat(formatNumber(vault.totalAssets, 6)),
-    },
-    {
-      name: 'Invested Assets',
-      value: parseFloat(formatNumber(vault.investedAssets, 6)),
-    },
-    {
-      name: 'Performance Fees',
-      value: parseFloat(formatNumber(vault.totalPerformanceFees, 4)),
-    },
-  ] : [];
-
   const userPositions = vault?.positions.filter(pos => 
     isConnected && pos.user.toLowerCase() === userAddress?.toLowerCase()
   ) || [];
@@ -139,9 +123,48 @@ export default function VaultDetailPage() {
 
   const vestingRate = (parseInt(vault.vestingEnd) - (new Date().getTime() / 1000)) / (parseInt(vault.vestingEnd) - parseInt(vault.vestingStart));
   const totalShares = totalAssets; // TODO: change to totalShares
-  const vestedShares = totalAssets * (1 - vestingRate); // TODO: change to totalShares
+  const sharesVested = totalAssets * (1 - vestingRate); // TODO: change to totalShares
 
   // console.log('VESTING RATE:', vestingRate);
+
+  // Pie chart data
+  const pieData = vault ? [
+    {
+      name: 'Contract Assets',
+      value: parseFloat(formatNumber(vault.totalAssets, 6)),
+    },
+    {
+      name: 'Invested Assets',
+      value: parseFloat(formatNumber(vault.investedAssets, 6)),
+    },
+    {
+      name: 'Performance Fees',
+      value: parseFloat(formatNumber(vault.totalPerformanceFees, 4)),
+    },
+  ] : [];
+
+  // Shares distribution data
+  const sharesData = vault ? (() => {
+    // Calculate shares held by vault (locked shares in positions)
+    const sharesLocked = 0.9;
+    // Shares not held by vault (unlocked/released shares)
+    const sharesUnlocked = totalShares - sharesLocked - sharesVested;
+
+    return [
+      {
+        name: 'Shares Locked',
+        value: sharesLocked,
+      },
+      {
+        name: 'Shares Unlocked',
+        value: sharesUnlocked,
+      },
+      {
+        name: 'Shares Vested',
+        value: sharesVested,
+      },
+    ];
+  })() : [];
 
   // Vesting schedule data
   const vestingData = (() => {
@@ -198,17 +221,26 @@ export default function VaultDetailPage() {
             <div>
               <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{vault.name}</h1>
               <p className="text-lg text-gray-600 dark:text-gray-400">{vault.symbol}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Contract</p>
-              <a
+              {/* <a
                 href={`${blockExplorerUrl}/address/${vault.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm font-mono text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
               >
                 {formatAddress(vault.id)}
-              </a>
+              </a> */}
+            </div>
+            <div className="text-right">
+            <button
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md text-sm font-semibold transition-colors cursor-pointer"
+              // onClick handler can be replaced by actual deposit logic
+              onClick={() => {
+                // You may want to replace this with your actual deposit modal trigger or navigation
+                alert('Deposit functionality coming soon!');
+              }}
+            >
+              Deposit
+            </button>
             </div>
           </div>
 
@@ -231,61 +263,123 @@ export default function VaultDetailPage() {
             </div>
           </div>
 
-          {/* Pie Chart */}
+          {/* Pie Charts */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Asset Distribution</h2>
-            <div className="flex items-center h-64 gap-2">
-              {/* Pie Chart */}
-              <div className="h-full shrink-0" style={{ width: '256px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={false}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value: number) => formatNumber((value * 1e18).toString())} />
-                  </PieChart>
-                </ResponsiveContainer>
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Asset Distribution Chart */}
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Asset Distribution</h2>
+                <div className="flex items-center h-64 gap-2">
+                  {/* Pie Chart */}
+                  <div className="h-full shrink-0" style={{ width: '256px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={pieData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={false}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {pieData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value: number) => formatNumber((value * 1e18).toString())} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  {/* Custom Legend on the right */}
+                  <div className="flex flex-col gap-3 shrink-0">
+                    {pieData.map((entry, index) => {
+                      const total = pieData.reduce((sum, item) => sum + item.value, 0);
+                      const percent = total > 0 ? (entry.value / total) * 100 : 0;
+                      return (
+                        <div key={`legend-${index}`} className="flex items-center gap-3">
+                          <div
+                            className="w-4 h-4 rounded shrink-0"
+                            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                          />
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              {entry.name}
+                            </span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                              {percent.toFixed(1)}%
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-              {/* Custom Legend on the right */}
-              <div className="flex flex-col gap-3 shrink-0">
-                {pieData.map((entry, index) => {
-                  const total = pieData.reduce((sum, item) => sum + item.value, 0);
-                  const percent = total > 0 ? (entry.value / total) * 100 : 0;
-                  return (
-                    <div key={`legend-${index}`} className="flex items-center gap-3">
-                      <div
-                        className="w-4 h-4 rounded shrink-0"
-                        style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                      />
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          {entry.name}
-                        </span>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                          {percent.toFixed(1)}%
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+
+              {/* Shares Distribution Chart */}
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Shares Distribution</h2>
+                <div className="flex items-center h-64 gap-2">
+                  {/* Pie Chart */}
+                  <div className="h-full shrink-0" style={{ width: '256px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={sharesData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={false}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {sharesData.map((entry, index) => (
+                            <Cell key={`cell-shares-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value: number) => value.toFixed(2)} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  {/* Custom Legend on the right */}
+                  <div className="flex flex-col gap-3 shrink-0">
+                    {sharesData.map((entry, index) => {
+                      const total = sharesData.reduce((sum, item) => sum + item.value, 0);
+                      const percent = total > 0 ? (entry.value / total) * 100 : 0;
+                      return (
+                        <div key={`legend-shares-${index}`} className="flex items-center gap-3">
+                          <div
+                            className="w-4 h-4 rounded shrink-0"
+                            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                          />
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              {entry.name}
+                            </span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                              {percent.toFixed(1)}%
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Vesting Schedule Chart */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Vesting Schedule</h2>
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Vesting Schedule</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {formatDate(vault.vestingStart)} - {formatDate(vault.vestingEnd)}
+              </p>
+            </div>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={vestingData}>
@@ -321,95 +415,49 @@ export default function VaultDetailPage() {
           {isConnected && userPositions.length > 0 && (
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Your Positions</h2>
-              <div className="space-y-4">
-                {userPositions.map((position) => (
-                  <div key={position.id} className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
-                    <div className="grid md:grid-cols-6 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-600 dark:text-gray-400">Position ID</p>
-                        <p className="font-medium text-gray-900 dark:text-white">{position.positionId}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600 dark:text-gray-400">Assets</p>
-                        <p className="font-medium text-gray-900 dark:text-white">{formatNumber(position.assetAmount, 6)}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600 dark:text-gray-400">Shares</p>
-                        <p className="font-medium text-gray-900 dark:text-white">{formatNumber(position.shareAmount, 6)}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600 dark:text-gray-400">Assets Divested</p>
-                        <p className="font-medium text-gray-900 dark:text-white">{formatNumber(position.assetsReleased, 6)}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600 dark:text-gray-400">Shares Unlocked</p>
-                        <p className="font-medium text-gray-900 dark:text-white">{formatNumber(position.sharesUnlocked, 6)}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600 dark:text-gray-400">Divestible Shares</p>
-                        <p className="font-medium text-gray-900 dark:text-white">{parseFloat(formatNumber(position.shareAmount, 6)) * vestingRate}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm cursor-pointer">
-                          Divest
-                        </button>
-                        <button className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm cursor-pointer">
-                          Unlock
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 dark:bg-gray-900">
+                      <tr>
+                        <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-600 dark:text-gray-400">Position ID</th>
+                        <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-600 dark:text-gray-400">Shares</th>
+                        <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-600 dark:text-gray-400">Assets</th>
+                        <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-600 dark:text-gray-400">Shares Unlocked</th>
+                        <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-600 dark:text-gray-400">Assets Divested</th>
+                        <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-600 dark:text-gray-400">Divestible Shares</th>
+                        <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-600 dark:text-gray-400">Vested Shares</th>
+                        <th className="text-center py-2.5 px-4 text-xs font-medium text-gray-600 dark:text-gray-400">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                      {userPositions.map((position) => (
+                        <tr key={position.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/50">
+                          <td className="py-2.5 px-4 text-sm font-medium text-gray-900 dark:text-white">{position.positionId}</td>
+                          <td className="py-2.5 px-4 text-sm text-right text-gray-900 dark:text-white">{formatNumber(position.shareAmount, 6)}</td>
+                          <td className="py-2.5 px-4 text-sm text-right text-gray-900 dark:text-white">{formatNumber(position.assetAmount, 6)}</td>
+                          <td className="py-2.5 px-4 text-sm text-right text-gray-900 dark:text-white">{formatNumber(position.sharesUnlocked, 6)}</td>
+                          <td className="py-2.5 px-4 text-sm text-right text-gray-900 dark:text-white">{formatNumber(position.assetsReleased, 6)}</td>
+                          <td className="py-2.5 px-4 text-sm text-right text-gray-900 dark:text-white">{(parseFloat(formatNumber(position.shareAmount, 6)) * vestingRate).toFixed(2)}</td>
+                          <td className="py-2.5 px-4 text-sm text-right text-gray-900 dark:text-white">{formatNumber("0", 6)}</td>
+                          <td className="py-2.5 px-4">
+                            <div className="flex gap-2 justify-center">
+                              <button className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs font-medium cursor-pointer transition-colors">
+                                Divest
+                              </button>
+                              <button className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-medium cursor-pointer transition-colors">
+                                Unlock
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
-
-          {/* All Positions */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">All Positions</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200 dark:border-gray-700">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-400">User</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-400">Asset Amount</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-400">Share Amount</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-400">Unlocked</th>
-                    <th className="text-center py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-400">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {vault.positions.map((position) => (
-                    <tr key={position.id} className="border-b border-gray-200 dark:border-gray-700">
-                      <td className="py-3 px-4 text-sm font-mono text-gray-900 dark:text-white">
-                        {formatAddress(position.user)}
-                      </td>
-                      <td className="py-3 px-4 text-sm text-right text-gray-900 dark:text-white">
-                        {formatNumber(position.assetAmount, 6)}
-                      </td>
-                      <td className="py-3 px-4 text-sm text-right text-gray-900 dark:text-white">
-                        {formatNumber(position.shareAmount, 6)}
-                      </td>
-                      <td className="py-3 px-4 text-sm text-right text-gray-900 dark:text-white">
-                        {formatNumber(position.sharesUnlocked, 6)}
-                      </td>
-                      <td className="py-3 px-4 text-sm text-center">
-                        {position.isClosed ? (
-                          <span className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs">
-                            Closed
-                          </span>
-                        ) : (
-                          <span className="px-2 py-1 bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 rounded text-xs">
-                            Active
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
       </main>
     </div>
