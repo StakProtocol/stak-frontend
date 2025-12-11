@@ -56,23 +56,23 @@ export function PositionCard({ position, vaultDecimals, vestingRate, pricePerSha
             {/* Main Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Shares</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets Invested</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {formatNumber(position.assetAmount, vaultDecimals).toFixed(2)}
+                    </p>
+                </div>
+                
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Shares Locked</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {formatNumber(position.shareAmount, vaultDecimals).toFixed(2)}
                     </p>
                 </div>
 
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Divestible Shares</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {formatNumber(position.assetAmount, vaultDecimals).toFixed(2)}
-                    </p>
-                </div>
-
-                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets Divested</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {formatNumber(position.assetsDivested, vaultDecimals).toFixed(2)}
+                        {divestibleShares}
                     </p>
                 </div>
 
@@ -91,16 +91,16 @@ export function PositionCard({ position, vaultDecimals, vestingRate, pricePerSha
 
             <div className="border-t border-gray-700 pt-4 grid grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Shares Unlocked</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets Divested</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {formatNumber(position.sharesUnlocked, vaultDecimals).toFixed(2)}
+                        {formatNumber(position.assetsDivested, vaultDecimals).toFixed(2)}
                     </p>
                 </div>
 
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Divestible Shares</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Shares Unlocked</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {divestibleShares}
+                        {formatNumber(position.sharesUnlocked, vaultDecimals).toFixed(2)}
                     </p>
                 </div>
 
@@ -118,7 +118,7 @@ export function PositionCard({ position, vaultDecimals, vestingRate, pricePerSha
                 <div className="mt-3">
                     <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
                         <span>Vesting Progress</span>
-                        <span>{((1 - vestingRate) * 100).toFixed(1)}%</span>
+                        <span>{((1 - vestingRate) * 100).toFixed(2)}%</span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <div

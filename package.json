@@ -17,6 +17,7 @@
     "next": "16.0.8",
     "react": "19.2.1",
     "react-dom": "19.2.1",
+    "react-hot-toast": "^2.6.0",
     "recharts": "^3.5.1",
     "thirdweb": "^5.96.7",
     "viem": "^2.41.2",

@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
 import { PositionCard } from '@/components/PositionCard';
+import { DepositModal } from '@/components/DepositModal';
 import { graphqlClient, GET_STAK_VAULT } from '@/lib/graphql';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { useAccount } from 'wagmi';
@@ -51,6 +52,7 @@ export default function VaultDetailPage() {
   const { address: userAddress, isConnected } = useAccount();
   const [vault, setVault] = useState<StakVault | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
   useEffect(() => {
     async function fetchVault() {
@@ -212,10 +214,8 @@ export default function VaultDetailPage() {
             </div>
             <div className="text-right">
               <button
-                className="px-4 py-2 bg-primary hover:bg-dark-primary/70 text-white rounded-md text-sm font-semibold transition-colors cursor-pointer"
-                onClick={() => {
-                  alert('Deposit functionality coming soon!');
-                }}
+                className="px-4 py-2 bg-[#FF69B4] hover:bg-[#FF1493] text-white rounded-md text-sm font-semibold transition-colors cursor-pointer"
+                onClick={() => setIsDepositModalOpen(true)}
               >
                 Deposit
               </button>
@@ -241,7 +241,7 @@ export default function VaultDetailPage() {
             </div>
             <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Price Per Share</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{pricePerShare}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{pricePerShare.toFixed(2)}</p>
             </div>
           </div>
 
@@ -418,6 +418,18 @@ export default function VaultDetailPage() {
           )}
         </div>
       </main>
+
+      {/* Deposit Modal */}
+      {vault && (
+        <DepositModal
+          isOpen={isDepositModalOpen}
+          onClose={() => setIsDepositModalOpen(false)}
+          vaultAddress={address as `0x${string}`}
+          assetAddress={vault.asset as `0x${string}`}
+          assetDecimals={vault.decimals}
+          assetSymbol={vault.symbol}
+        />
+      )}
     </div>
   );
 }
