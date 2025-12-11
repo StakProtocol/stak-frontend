@@ -408,9 +408,11 @@ export default function VaultDetailPage() {
                   <PositionCard
                     key={position.id}
                     position={position}
+                    vaultAddress={address as `0x${string}`}
                     vaultDecimals={vault.decimals}
                     vestingRate={vestingRate}
                     pricePerShare={pricePerShare}
+                    assetSymbol={vault.symbol}
                   />
                 ))}
               </div>

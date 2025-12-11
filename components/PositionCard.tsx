@@ -1,4 +1,8 @@
 import { formatNumber } from '@/app/utils/helper';
+import { useState } from 'react';
+import { DivestModal } from './DivestModal';
+import { UnlockModal } from './UnlockModal';
+import { type Address } from 'viem';
 
 interface StakPosition {
     id: string;
@@ -14,14 +18,19 @@ interface StakPosition {
 
 interface PositionCardProps {
     position: StakPosition;
+    vaultAddress: Address;
     vaultDecimals: string;
     vestingRate: number;
     pricePerShare: number;
+    assetSymbol: string;
 }
 
-export function PositionCard({ position, vaultDecimals, vestingRate, pricePerShare }: PositionCardProps) {
+export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRate, pricePerShare, assetSymbol }: PositionCardProps) {
+    const [isDivestModalOpen, setIsDivestModalOpen] = useState(false);
+    const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
+    
     const positionShare = formatNumber(position.shareAmount, vaultDecimals);
-    const divestibleShares = parseFloat((positionShare * vestingRate) + "").toFixed(2);
+    const divestibleShares = parseFloat((positionShare * vestingRate) + "");
     const vestedShares = parseFloat((positionShare * (1 - vestingRate)) + "").toFixed(2);
     const currentValue = (positionShare * pricePerShare).toFixed(2);
 
@@ -32,6 +41,7 @@ export function PositionCard({ position, vaultDecimals, vestingRate, pricePerSha
     const isProfit = profitLoss >= 0;
 
     return (
+        <>
         <div className="bg-white dark:bg-dark-primary rounded-xl p-6 transition-all duration-200">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
@@ -44,10 +54,16 @@ export function PositionCard({ position, vaultDecimals, vestingRate, pricePerSha
                     </p>
                 </div>
                 <div className="flex gap-2">
-                    <button className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium cursor-pointer transition-colors">
+                    <button 
+                        onClick={() => setIsDivestModalOpen(true)}
+                        className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium cursor-pointer transition-colors"
+                    >
                         Divest
                     </button>
-                    <button className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium cursor-pointer transition-colors">
+                    <button 
+                        onClick={() => setIsUnlockModalOpen(true)}
+                        className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium cursor-pointer transition-colors"
+                    >
                         Unlock
                     </button>
                 </div>
@@ -72,7 +88,7 @@ export function PositionCard({ position, vaultDecimals, vestingRate, pricePerSha
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Divestible Shares</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {divestibleShares}
+                        {divestibleShares.toFixed(2)}
                     </p>
                 </div>
 
@@ -127,18 +143,29 @@ export function PositionCard({ position, vaultDecimals, vestingRate, pricePerSha
                         ></div>
                     </div>
                 </div>
-
-                {formatNumber(position.assetsDivested, vaultDecimals) > 0 && (
-                    <div className="mt-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                        <div className="flex justify-between items-center">
-                            <span className="text-sm text-yellow-700 dark:text-yellow-400">Assets Divested</span>
-                            <span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
-                                {formatNumber(position.assetsDivested, vaultDecimals).toFixed(2)}
-                            </span>
-                        </div>
-                    </div>
-                )}
             </div>
+
         </div>
+
+        {/* Modals */}
+        <DivestModal
+            isOpen={isDivestModalOpen}
+            onClose={() => setIsDivestModalOpen(false)}
+            vaultAddress={vaultAddress}
+            positionId={position.positionId}
+            maxShares={divestibleShares}
+            vaultDecimals={vaultDecimals}
+            assetSymbol={assetSymbol}
+        />
+        <UnlockModal
+            isOpen={isUnlockModalOpen}
+            onClose={() => setIsUnlockModalOpen(false)}
+            vaultAddress={vaultAddress}
+            positionId={position.positionId}
+            maxShares={positionShare}
+            vaultDecimals={vaultDecimals}
+            assetSymbol={assetSymbol}
+        />
+        </>
     );
 }
