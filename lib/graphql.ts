@@ -21,9 +21,16 @@ export const GET_FLYING_ICOS = `
       vestingEnd
       tokenCap
       tokensPerUsd
-      totalAssets
       investedAssets
       positionCount
+      totalSupply
+      tokensUnlocked
+      assets {
+        id
+        symbol
+        decimals
+        totalAssets
+      }
       createdAt
       updatedAt
     }
@@ -41,11 +48,18 @@ export const GET_FLYING_ICO = `
       vestingEnd
       tokenCap
       tokensPerUsd
-      totalAssets
       investedAssets
       positionCount
+      totalSupply
+      tokensUnlocked
       createdAt
       updatedAt
+      assets {
+        id
+        symbol
+        decimals
+        totalAssets
+      }
       positions(first: 100, orderBy: createdAt, orderDirection: desc) {
         id
         positionId

@@ -7,10 +7,7 @@ import { Navbar } from '@/components/Navbar';
 import { graphqlClient, GET_FLYING_ICO } from '@/lib/graphql';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { useAccount } from 'wagmi';
-import { readContract, writeContract, waitForTransactionReceipt } from '@wagmi/core';
-import { config } from '@/lib/wagmi';
-import { parseEther, formatEther } from 'viem';
-import FlyingICOABI from '@/app/abis/FlyingICO.json';
+import { formatNumber } from '@/app/utils/helper';
 
 interface FlyingPosition {
   id: string;
@@ -36,6 +33,8 @@ interface FlyingICO {
   totalAssets: string;
   investedAssets: string;
   positionCount: string;
+  tokensLocked: string;
+  totalSupply: string;
   positions: FlyingPosition[];
 }
 
@@ -71,32 +70,9 @@ export default function TokenDetailPage() {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
 
-  const formatNumber = (value: string) => {
-    const num = parseFloat(value) / 1e18;
-    return new Intl.NumberFormat('en-US', {
-      maximumFractionDigits: 4,
-    }).format(num);
-  };
-
   const formatDate = (timestamp: string) => {
     return new Date(parseInt(timestamp) * 1000).toLocaleDateString();
   };
-
-  // Calculate chart data
-  const pieData = ico ? [
-    {
-      name: 'Total Supply',
-      value: parseFloat(ico.tokenCap) / 1e18,
-    },
-    {
-      name: 'Tokens Locked',
-      value: ico.positions.reduce((sum, pos) => sum + parseFloat(pos.vestingAmount) / 1e18, 0),
-    },
-    {
-      name: 'Tokens Purchased',
-      value: ico.positions.reduce((sum, pos) => sum + parseFloat(pos.tokenAmount) / 1e18, 0),
-    },
-  ] : [];
 
   // Vesting schedule data
   const vestingData = ico ? (() => {
@@ -176,6 +152,26 @@ export default function TokenDetailPage() {
     );
   }
 
+  const totalSupply = formatNumber(ico.totalSupply);
+  const tokensLocked = formatNumber(ico.tokensLocked);
+  const tokensUnlocked = totalSupply - tokensLocked;
+
+  // Calculate chart data
+  const pieData = ico ? [
+    {
+      name: 'Total Cap',
+      value: ico.tokenCap,
+    },
+    {
+      name: 'Tokens Locked',
+      value: tokensLocked.toFixed(2),
+    },
+    {
+      name: 'Tokens Purchased',
+      value: tokensUnlocked.toFixed(2),
+    },
+  ] : [];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
       <Navbar />
@@ -199,15 +195,23 @@ export default function TokenDetailPage() {
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Token Cap</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(ico.tokenCap)}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(ico.tokenCap, "0")}</p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Assets</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(ico.totalAssets)}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(ico.totalAssets).toFixed(2)}</p>
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Supply</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(ico.totalSupply).toFixed(2)}</p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Positions</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{ico.positionCount}</p>
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Tokens Per USD</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(ico.tokensPerUsd)}</p>
             </div>
           </div>
 
@@ -219,10 +223,10 @@ export default function TokenDetailPage() {
                 <PieChart>
                   <Pie
                     data={pieData}
-                    cx="50%"
+                    cx="35%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) => `${name}: ${( (percent || 0) * 100).toFixed(0)}%`}
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
@@ -232,7 +236,11 @@ export default function TokenDetailPage() {
                     ))}
                   </Pie>
                   <Tooltip formatter={(value: number) => formatNumber((value * 1e18).toString())} />
-                  <Legend />
+                  <Legend 
+                    layout="vertical" 
+                    align="right" 
+                    verticalAlign="middle"
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
