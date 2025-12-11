@@ -72,6 +72,7 @@ export const GET_STAK_VAULTS = `
       decimals
       totalAssets
       investedAssets
+      totalPerformanceFees
       redeemsAtNavEnabled
       positionCount
     }

@@ -16,6 +16,7 @@ interface StakVault {
   totalAssets: string;
   investedAssets: string;
   redeemsAtNavEnabled: boolean;
+  totalPerformanceFees: string;
   positionCount: string;
 }
 
@@ -64,52 +65,55 @@ export default function VaultsPage() {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {vaults.map((vault) => (
-              <Link key={vault.id} href={`/vaults/${vault.id}`}>
-                <div className="bg-white dark:bg-dark-primary rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all border-2 border-gray-200 dark:border-gray-700 hover:border-primary">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">{vault.name}</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{vault.symbol}</p>
+            {vaults.map((vault) => {
+              const total = formatNumber(vault.totalAssets, vault.decimals) + formatNumber(vault.investedAssets, vault.decimals) - formatNumber(vault.totalPerformanceFees, "4");
+              return (
+                <Link key={vault.id} href={`/vaults/${vault.id}`}>
+                  <div className="bg-white dark:bg-dark-primary rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all border-2 border-gray-200 dark:border-gray-700 hover:border-primary">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">{vault.name}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{vault.symbol}</p>
+                      </div>
+                      <div className="w-12 h-12 flex items-center justify-center">
+                        <Image
+                          className="object-cover w-12 h-12"
+                          src="/tokens/usdc.png"
+                          alt="Stak Protocol Logo"
+                          width={100}
+                          height={100}
+                        />
+                      </div>
                     </div>
-                    <div className="w-12 h-12 flex items-center justify-center">
-                      <Image
-                        className="object-cover w-12 h-12"
-                        src="/tokens/usdc.png"
-                        alt="Stak Protocol Logo"
-                        width={100}
-                        height={100}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">Total Assets:</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">{formatNumber(vault.totalAssets, vault.decimals)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">Invested:</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">{formatNumber(vault.investedAssets, vault.decimals)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">Positions:</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">{vault.positionCount}</span>
-                    </div>
-                    <div className="flex justify-between gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {formatAddress(vault.id)}
-                      </span>
-                      {vault.redeemsAtNavEnabled && (
-                        <span className="px-2 py-1 bg-green-100 dark:bg-primary text-green-800 dark:text-black text-xs rounded">
-                          NAV Enabled
+
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-300">Total Assets:</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">{total}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-300">Invested:</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">{formatNumber(vault.investedAssets, vault.decimals)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-300">Positions:</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">{vault.positionCount}</span>
+                      </div>
+                      <div className="flex justify-between gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          {formatAddress(vault.id)}
                         </span>
-                      )}
+                        {vault.redeemsAtNavEnabled && (
+                          <span className="px-2 py-1 bg-green-100 dark:bg-primary text-green-800 dark:text-black text-xs rounded">
+                            NAV Enabled
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              )
+            })}
           </div>
         )}
       </main>

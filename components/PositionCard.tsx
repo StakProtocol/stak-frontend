@@ -71,7 +71,7 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
                     </button>
                     <button 
                         onClick={() => setIsUnlockModalOpen(true)}
-                        className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium cursor-pointer transition-colors"
+                        className="px-3 py-1.5 bg-[#2fc7a8]/20 hover:bg-[#2fc7a8]/90 text-white rounded-lg text-sm font-medium cursor-pointer transition-colors"
                     >
                         Unlock
                     </button>

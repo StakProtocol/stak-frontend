@@ -33,6 +33,7 @@ export function DepositModal({
   const [depositAmount, setDepositAmount] = useState('');
   const [walletBalance, setWalletBalance] = useState<bigint>(BigInt(0));
   const [allowance, setAllowance] = useState<bigint>(BigInt(0));
+  const [symbol, setSymbol] = useState('');
   const [isApproving, setIsApproving] = useState(false);
   const [isDepositing, setIsDepositing] = useState(false);
   const [step, setStep] = useState<'approve' | 'deposit'>('approve');
@@ -65,6 +66,15 @@ export function DepositModal({
           args: [userAddress, vaultAddress],
         });
         setAllowance(currentAllowance as bigint);
+
+        // Get symbol
+        const assetSymbol = await readContract(config, {
+          address: assetAddress,
+          abi: erc20Abi,
+          functionName: 'symbol',
+          args: [],
+        });
+        setSymbol(assetSymbol);
       } catch (error) {
         console.error('Error loading balance/allowance:', error);
       }
@@ -230,13 +240,13 @@ export function DepositModal({
   const previewSharesFormatted = previewShares > 0 ? formatNumber(previewShares.toString(), "18") : 0;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50" onClick={onClose}>
       <div className="bg-white dark:bg-dark-primary rounded-xl p-6 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Deposit {assetSymbol}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Deposit {symbol}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl font-bold"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl font-bold cursor-pointer"
           >
             ×
           </button>
@@ -246,11 +256,11 @@ export function DepositModal({
         <div className="mb-4 space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600 dark:text-gray-400">Wallet Balance:</span>
-            <span className="font-medium text-gray-900 dark:text-white">{balanceFormatted.toFixed(2)} {assetSymbol}</span>
+            <span className="font-medium text-gray-900 dark:text-white">{balanceFormatted.toFixed(2)} {symbol}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600 dark:text-gray-400">Approved Amount:</span>
-            <span className="font-medium text-gray-900 dark:text-white">{allowanceFormatted.toFixed(2)} {assetSymbol}</span>
+            <span className="font-medium text-gray-900 dark:text-white">{allowanceFormatted.toFixed(2)} {symbol}</span>
           </div>
         </div>
 
@@ -266,11 +276,11 @@ export function DepositModal({
               onChange={(e) => setDepositAmount(e.target.value)}
               placeholder="0.00"
               step="any"
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#FF69B4]"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#19a5ba]"
             />
             <button
               onClick={handleMax}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm font-medium"
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm font-medium cursor-pointer"
             >
               MAX
             </button>
@@ -280,11 +290,11 @@ export function DepositModal({
         {/* Steps */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <div className={`flex-1 text-center py-2 ${step === 'approve' ? 'bg-[#FF69B4]/20 text-[#FF69B4]' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'} rounded-lg transition-colors`}>
+            <div className={`flex-1 text-center py-2 ${step === 'approve' ? 'bg-[#19a5ba]/20 text-[#19a5ba]' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'} rounded-lg transition-colors`}>
               <span className="font-medium">1. Approve</span>
             </div>
             <div className="w-4 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
-            <div className={`flex-1 text-center py-2 ${step === 'deposit' ? 'bg-[#FF69B4]/20 text-[#FF69B4]' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'} rounded-lg transition-colors`}>
+            <div className={`flex-1 text-center py-2 ${step === 'deposit' ? 'bg-[#19a5ba]/20 text-[#19a5ba]' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'} rounded-lg transition-colors`}>
               <span className="font-medium">2. Deposit</span>
             </div>
           </div>
@@ -328,7 +338,7 @@ export function DepositModal({
                   return true;
                 }
               })()}
-              className="flex-1 px-4 py-3 bg-[#FF69B4] hover:bg-[#FF1493] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+              className="flex-1 px-4 py-3 bg-[#19a5ba]/20 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
             >
               {isApproving ? 'Approving...' : 'Approve'}
             </button>
@@ -336,7 +346,7 @@ export function DepositModal({
             <button
               onClick={handleDeposit}
               disabled={!depositAmount || isDepositing}
-              className="flex-1 px-4 py-3 bg-[#FF69B4] hover:bg-[#FF1493] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+              className="flex-1 px-4 py-3 bg-[#19a5ba]/20 hover:bg-[#19a5ba]/90 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
             >
               {isDepositing ? 'Depositing...' : 'Deposit'}
             </button>
@@ -344,7 +354,7 @@ export function DepositModal({
           <button
             onClick={onClose}
             disabled={isApproving || isDepositing}
-            className="px-4 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors"
+            className="px-4 py-3 cursor-pointer bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors"
           >
             Cancel
           </button>
@@ -356,7 +366,7 @@ export function DepositModal({
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600 dark:text-gray-400">Shares You Will Receive:</span>
               <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                {previewSharesFormatted.toFixed(2)}
+                {previewSharesFormatted.toFixed(2)} {assetSymbol}
               </span>
             </div>
           </div>
