@@ -4,35 +4,34 @@ import { useState, useEffect } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 import { writeContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config } from '@/lib/wagmi';
-import { parseUnits, formatUnits, type Address } from 'viem';
-import StakVaultABI from '@/app/abis/StakVault.json';
-import { formatNumber } from '@/app/utils/helper';
+import { parseUnits, type Address } from 'viem';
+import FlyingICOABI from '@/app/abis/FlyingICO.json';
 import { chainByID } from '@/app/utils/chains';
 import toast from 'react-hot-toast';
 
-interface DivestModalProps {
+interface ICODivestModalProps {
   isOpen: boolean;
   onClose: () => void;
-  vaultAddress: Address;
+  icoAddress: Address;
   positionId: string;
-  maxShares: number; // divestible shares
-  vaultDecimals: string;
+  maxTokens: number; // divestible tokens
+  assetDecimals: string;
   assetSymbol: string;
 }
 
-export function DivestModal({
+export function ICODivestModal({
   isOpen,
   onClose,
-  vaultAddress,
+  icoAddress,
   positionId,
-  maxShares,
-  vaultDecimals,
+  maxTokens,
+  assetDecimals,
   assetSymbol,
-}: DivestModalProps) {
+}: ICODivestModalProps) {
   const { address: userAddress, isConnected } = useAccount();
   const chainId = useChainId();
   const chain = chainByID(chainId);
-  const [sharesAmount, setSharesAmount] = useState('');
+  const [tokensAmount, setTokensAmount] = useState('');
   const [isDivesting, setIsDivesting] = useState(false);
   const [txStatus, setTxStatus] = useState<string>('');
   const [txHash, setTxHash] = useState<string>('');
@@ -40,30 +39,31 @@ export function DivestModal({
   // Reset when modal closes
   useEffect(() => {
     if (!isOpen) {
-      setSharesAmount('');
+      setTokensAmount('');
       setTxStatus('');
       setTxHash('');
     }
   }, [isOpen]);
 
   const handleDivest = async () => {
-    if (!userAddress || !sharesAmount || !isConnected) return;
+    if (!userAddress || !tokensAmount || !isConnected) return;
 
     setIsDivesting(true);
     setTxStatus('Waiting for wallet confirmation...');
     setTxHash('');
 
     try {
-      const sharesBN = parseUnits(sharesAmount, Number(vaultDecimals));
+      // Tokens use 18 decimals in FlyingICO
+      const tokensBN = parseUnits(tokensAmount, 18);
       const positionIdBN = BigInt(positionId);
 
       toast.loading('Please confirm the divest transaction in your wallet', { id: 'divest' });
 
       const hash = await writeContract(config, {
-        address: vaultAddress,
-        abi: StakVaultABI,
+        address: icoAddress,
+        abi: FlyingICOABI,
         functionName: 'divest',
-        args: [positionIdBN, sharesBN],
+        args: [positionIdBN, tokensBN],
       });
 
       setTxHash(hash);
@@ -78,7 +78,7 @@ export function DivestModal({
       // Wait a moment before closing to show success
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      setSharesAmount('');
+      setTokensAmount('');
       setTxStatus('');
       setTxHash('');
       onClose();
@@ -97,14 +97,14 @@ export function DivestModal({
   };
 
   const handleMax = () => {
-    setSharesAmount(maxShares.toFixed(6));
+    setTokensAmount(maxTokens.toFixed(6));
   };
 
   const isValidAmount = () => {
-    if (!sharesAmount) return false;
+    if (!tokensAmount) return false;
     try {
-      const amount = parseFloat(sharesAmount);
-      return amount > 0 && amount <= maxShares;
+      const amount = parseFloat(tokensAmount);
+      return amount > 0 && amount <= maxTokens;
     } catch {
       return false;
     }
@@ -116,7 +116,7 @@ export function DivestModal({
     <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50" onClick={onClose}>
       <div className="bg-white dark:bg-dark-primary rounded-xl p-6 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Divest Shares</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Divest Tokens</h2>
           <button
             onClick={onClose}
             disabled={isDivesting}
@@ -129,24 +129,24 @@ export function DivestModal({
         {/* Info */}
         <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-400">Max Divestible Shares:</span>
-            <span className="font-medium text-gray-900 dark:text-white">{maxShares.toFixed(2)}</span>
+            <span className="text-gray-600 dark:text-gray-400">Max Divestible Tokens:</span>
+            <span className="font-medium text-gray-900 dark:text-white">{maxTokens.toFixed(2)}</span>
           </div>
         </div>
 
         {/* Amount Input */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Shares to Divest
+            Tokens to Divest
           </label>
           <div className="flex gap-2">
             <input
               type="number"
-              value={sharesAmount}
-              onChange={(e) => setSharesAmount(e.target.value)}
+              value={tokensAmount}
+              onChange={(e) => setTokensAmount(e.target.value)}
               placeholder="0.00"
               step="any"
-              max={maxShares}
+              max={maxTokens}
               disabled={isDivesting}
               className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-50 disabled:cursor-not-allowed"
             />
@@ -158,9 +158,9 @@ export function DivestModal({
               MAX
             </button>
           </div>
-          {sharesAmount && !isValidAmount() && (
+          {tokensAmount && !isValidAmount() && (
             <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-              Amount must be between 0 and {maxShares.toFixed(2)}
+              Amount must be between 0 and {maxTokens.toFixed(2)}
             </p>
           )}
         </div>

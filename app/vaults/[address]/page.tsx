@@ -406,9 +406,6 @@ export default function VaultDetailPage() {
             <div className="mb-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Your Positions</h2>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {userPositions.length} position{userPositions.length !== 1 ? 's' : ''}
-                </div>
               </div>
               <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {userPositions.map((position) => (

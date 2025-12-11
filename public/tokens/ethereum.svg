@@ -1,21 +1,1 @@
-<?xml version="1.0" ?>
-<!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="0 0 32 32" id="_x3C_Layer_x3E_" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<style type="text/css">
-<![CDATA[
-	.st0{fill:none;stroke:#455A64;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-	.st1{fill:none;stroke:#263238;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-]]>
-</style>
-<g id="Ethereum_x2C__crypto_x2C__cryptocurrency_1_">
-<g id="XMLID_15_">
-<polygon class="st1" id="XMLID_8_" points="16.01,1.5 7.62,16.23 16.01,21.5 24.38,16.18   "/>
-<line class="st1" id="XMLID_31_" x1="16.01" x2="16.01" y1="30.5" y2="24.1"/>
-<polygon class="st1" id="XMLID_12_" points="16.01,30.5 7.62,18.83 16.01,24.1 24.38,18.78   "/>
-<polygon class="st1" id="XMLID_30_" points="16.01,12.3 7.62,16.23 16.01,21.5 24.38,16.18   "/>
-<line class="st1" id="XMLID_32_" x1="16.01" x2="16.01" y1="1.5" y2="21.5"/>
-<polygon class="st1" id="XMLID_192_" points="16.01,1.5 7.62,16.23 16.01,21.5 24.38,16.18   "/>
-</g>
-</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="2500" height="2500" viewBox="0 0 32 32"><g fill="none" fill-rule="evenodd"><circle cx="16" cy="16" r="16" fill="#627EEA"/><g fill="#FFF" fill-rule="nonzero"><path fill-opacity=".602" d="M16.498 4v8.87l7.497 3.35z"/><path d="M16.498 4 9 16.22l7.498-3.35z"/><path fill-opacity=".602" d="M16.498 21.968v6.027L24 17.616z"/><path d="M16.498 27.995v-6.028L9 17.616z"/><path fill-opacity=".2" d="m16.498 20.573 7.497-4.353-7.497-3.348z"/><path fill-opacity=".602" d="m9 16.22 7.498 4.353v-7.701z"/></g></g></svg>

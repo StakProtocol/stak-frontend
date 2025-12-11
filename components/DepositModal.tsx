@@ -276,7 +276,7 @@ export function DepositModal({
               onChange={(e) => setDepositAmount(e.target.value)}
               placeholder="0.00"
               step="any"
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#19a5ba]"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <button
               onClick={handleMax}
@@ -290,11 +290,11 @@ export function DepositModal({
         {/* Steps */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <div className={`flex-1 text-center py-2 ${step === 'approve' ? 'bg-[#19a5ba]/20 text-[#19a5ba]' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'} rounded-lg transition-colors`}>
+            <div className={`flex-1 text-center py-2 ${step === 'approve' ? 'bg-primary/20 text-primary' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'} rounded-lg transition-colors`}>
               <span className="font-medium">1. Approve</span>
             </div>
             <div className="w-4 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
-            <div className={`flex-1 text-center py-2 ${step === 'deposit' ? 'bg-[#19a5ba]/20 text-[#19a5ba]' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'} rounded-lg transition-colors`}>
+            <div className={`flex-1 text-center py-2 ${step === 'deposit' ? 'bg-primary/20 text-primary' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'} rounded-lg transition-colors`}>
               <span className="font-medium">2. Deposit</span>
             </div>
           </div>
@@ -338,7 +338,7 @@ export function DepositModal({
                   return true;
                 }
               })()}
-              className="flex-1 px-4 py-3 bg-[#19a5ba]/20 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+              className="flex-1 px-4 py-3 bg-primary/20 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
             >
               {isApproving ? 'Approving...' : 'Approve'}
             </button>
@@ -346,7 +346,7 @@ export function DepositModal({
             <button
               onClick={handleDeposit}
               disabled={!depositAmount || isDepositing}
-              className="flex-1 px-4 py-3 bg-[#19a5ba]/20 hover:bg-[#19a5ba]/90 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+              className="flex-1 px-4 py-3 bg-primary/60 hover:bg-primary/80 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
             >
               {isDepositing ? 'Depositing...' : 'Deposit'}
             </button>

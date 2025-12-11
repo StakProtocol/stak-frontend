@@ -61,7 +61,7 @@ export default function VaultsPage() {
           </div>
         ) : vaults.length === 0 ? (
           <div className="text-center py-12 bg-white dark:bg-dark-primary rounded-2xl shadow-lg">
-            <p className="text-gray-600 font-medium dark:text-gray-200 text-lg">No vaults found</p>
+            <p className="text-gray-600 font-medium dark:text-gray-200 text-lg">No Vaults found</p>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

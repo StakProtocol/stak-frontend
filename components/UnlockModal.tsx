@@ -196,7 +196,7 @@ export function UnlockModal({
           <button
             onClick={handleUnlock}
             disabled={!isValidAmount() || isUnlocking}
-            className="flex-1 cursor-pointer px-4 py-3 bg-[#2fc7a8]/20 hover:bg-[#2fc7a8]/90 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+            className="flex-1 cursor-pointer px-4 py-3 bg-[#2fc7a8]/60 hover:bg-[#2fc7a8]/80 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
           >
             {isUnlocking ? 'Unlocking...' : 'Unlock'}
           </button>

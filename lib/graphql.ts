@@ -25,8 +25,9 @@ export const GET_FLYING_ICOS = `
       positionCount
       totalSupply
       tokensUnlocked
-      assets {
+      acceptedAssets {
         id
+        address
         symbol
         decimals
         totalAssets
@@ -54,8 +55,9 @@ export const GET_FLYING_ICO = `
       tokensUnlocked
       createdAt
       updatedAt
-      assets {
+      acceptedAssets {
         id
+        address
         symbol
         decimals
         totalAssets
