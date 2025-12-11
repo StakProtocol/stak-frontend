@@ -109,6 +109,7 @@ export const GET_STAK_VAULT = `
         sharesUnlocked
         assetsDivested
         vestingAmount
+        initialAssets
         isClosed
         createdAt
         updatedAt

@@ -20,6 +20,7 @@ interface StakPosition {
   sharesUnlocked: string;
   assetsDivested: string;
   vestingAmount: string;
+  initialAssets: string;
   isClosed: boolean;
   createdAt: string;
 }
@@ -409,7 +410,7 @@ export default function VaultDetailPage() {
                   {userPositions.length} position{userPositions.length !== 1 ? 's' : ''}
                 </div>
               </div>
-              <div className="grid gap-6 sm:grid-cols-1 xl:grid-cols-2">
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {userPositions.map((position) => (
                   <PositionCard
                     key={position.id}

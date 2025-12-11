@@ -10,6 +10,7 @@ interface StakPosition {
     user: string;
     assetAmount: string;
     shareAmount: string;
+    initialAssets: string;
     sharesUnlocked: string;
     assetsDivested: string;
     vestingAmount: string;
@@ -34,13 +35,19 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
     const vestingAmount = formatNumber(position.vestingAmount, vaultDecimals);
     const divestibleShares = parseFloat((vestingAmount * vestingRate) - (vestingAmount - positionShare) + "");
     const vestedShares = parseFloat((positionShare * (1 - vestingRate)) + "").toFixed(2);
-    const currentValue = (positionShare * pricePerShare).toFixed(2);
 
     // Calculate profit/loss
-    const initialValue = formatNumber(position.assetAmount, vaultDecimals);
-    const profitLoss = parseFloat(currentValue) - initialValue;
+    const initialAssets = formatNumber(position.initialAssets, vaultDecimals);
+    const assetsDivested = formatNumber(position.assetsDivested, vaultDecimals);
+    const initialValue = initialAssets - assetsDivested;
+
+    const positionAssets = formatNumber(position.assetAmount, vaultDecimals);
+    const sharesUnlocked = formatNumber(position.sharesUnlocked, vaultDecimals);
+    const finalValue = positionAssets + (positionShare + sharesUnlocked) * pricePerShare;
+
+    const profitLoss = parseFloat(finalValue + "") - parseFloat(initialValue + "");
     const profitLossPercentage = initialValue > 0 ? ((profitLoss / initialValue) * 100).toFixed(2) : "0.00";
-    const isProfit = profitLoss >= 0;
+    const isProfit = profitLoss > -0.00000001;
 
     return (
         <>
@@ -72,7 +79,21 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
             </div>
 
             {/* Main Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 mb-4">
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+                    <p className={`text-xs mb-1 font-bold ${isProfit ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>P&L</p>
+                    <div className="flex items-center gap-1">
+                        <p className={`text-lg font-semibold ${isProfit ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                            {isProfit ? '+' : ''}{profitLoss.toFixed(2)}
+                        </p>
+                        <span className={`text-xs px-1.5 py-0.5 rounded ${isProfit ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                            {isProfit ? '+' : ''}{profitLossPercentage}%
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -86,28 +107,9 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
                         {formatNumber(position.shareAmount, vaultDecimals).toFixed(2)}
                     </p>
                 </div>
-
-                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Divestible Shares</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {divestibleShares.toFixed(2)}
-                    </p>
-                </div>
-
-                {/* <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">P&L</p>
-                    <div className="flex items-center gap-1">
-                        <p className={`text-lg font-semibold ${isProfit ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                            {isProfit ? '+' : ''}{profitLoss.toFixed(2)}
-                        </p>
-                        <span className={`text-xs px-1.5 py-0.5 rounded ${isProfit ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
-                            {isProfit ? '+' : ''}{profitLossPercentage}%
-                        </span>
-                    </div>
-                </div> */}
             </div>
 
-            <div className="border-t border-gray-700 pt-4 grid grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+            <div className="border-t border-gray-700 pt-4 grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets Divested</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -119,6 +121,15 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Shares Unlocked</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {formatNumber(position.sharesUnlocked, vaultDecimals).toFixed(2)}
+                    </p>
+                </div>
+            </div>
+
+            <div className="border-t border-gray-700 pt-4 grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Divestible Shares</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {divestibleShares.toFixed(2)}
                     </p>
                 </div>
 
