@@ -113,14 +113,14 @@ export function DivestModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50" onClick={onClose}>
       <div className="bg-white dark:bg-dark-primary rounded-xl p-6 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Divest Shares</h2>
           <button
             onClick={onClose}
             disabled={isDivesting}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-gray-400 cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 text-2xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             ×
           </button>
@@ -148,12 +148,12 @@ export function DivestModal({
               step="any"
               max={maxShares}
               disabled={isDivesting}
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#f5b342] disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <button
               onClick={handleMax}
               disabled={isDivesting}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-gray-200 cursor-pointer dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               MAX
             </button>
@@ -196,14 +196,14 @@ export function DivestModal({
           <button
             onClick={handleDivest}
             disabled={!isValidAmount() || isDivesting}
-            className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+            className="flex-1 px-4 py-3 cursor-pointer bg-[#f5b342]/20 hover:bg-[#f5b342]/90 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
           >
             {isDivesting ? 'Divesting...' : 'Divest'}
           </button>
           <button
             onClick={onClose}
             disabled={isDivesting}
-            className="px-4 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors"
+            className="px-4 py-3 bg-gray-200 cursor-pointer dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors"
           >
             Cancel
           </button>

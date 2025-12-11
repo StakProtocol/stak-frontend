@@ -64,13 +64,13 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
                 <div className="flex gap-2">
                     <button 
                         onClick={() => setIsDivestModalOpen(true)}
-                        className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium cursor-pointer transition-colors"
+                        className="px-3 py-1.5 bg-[#f5b342]/90 hover:bg-[#f5b342]/40 text-white rounded-lg text-sm font-medium cursor-pointer transition-colors"
                     >
                         Divest
                     </button>
                     <button 
                         onClick={() => setIsUnlockModalOpen(true)}
-                        className="px-3 py-1.5 bg-[#2fc7a8]/20 hover:bg-[#2fc7a8]/90 text-white rounded-lg text-sm font-medium cursor-pointer transition-colors"
+                        className="px-3 py-1.5 bg-[#2fc7a8]/90 hover:bg-[#2fc7a8]/40 text-white rounded-lg text-sm font-medium cursor-pointer transition-colors"
                     >
                         Unlock
                     </button>
