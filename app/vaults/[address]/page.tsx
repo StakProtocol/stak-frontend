@@ -19,6 +19,7 @@ interface StakPosition {
   shareAmount: string;
   sharesUnlocked: string;
   assetsDivested: string;
+  vestingAmount: string;
   isClosed: boolean;
   createdAt: string;
 }
@@ -39,7 +40,7 @@ interface StakVault {
   totalAssets: string;
   investedAssets: string;
   totalShares: string;
-  totalSharesUnlocked: string;
+  totalSupply: string;
   positionCount: string;
   positions: StakPosition[];
 }
@@ -107,17 +108,18 @@ export default function VaultDetailPage() {
   const totalAssets = formatNumber(vault.totalAssets, vault.decimals) + formatNumber(vault.investedAssets, vault.decimals) - formatNumber(vault.totalPerformanceFees, "4");
   const investedAssets = formatNumber(vault.investedAssets, vault.decimals);
   const totalShares = formatNumber(vault.totalShares, vault.decimals);
-  const pricePerShare = totalAssets / totalShares;
+  const totalSupply = formatNumber(vault.totalSupply, vault.decimals);
+  const pricePerShare = totalAssets / totalSupply;
   // Calculate utilization rate
   const utilizationRate = totalAssets > 0 ? (investedAssets / totalAssets) * 100 : 0;
 
-  const vestingRate = (parseInt(vault.vestingEnd) - (new Date().getTime() / 1000)) / (parseInt(vault.vestingEnd) - parseInt(vault.vestingStart));
-  const sharesVested = totalShares * (1 - vestingRate);
+  let vestingRate = (parseInt(vault.vestingEnd) - (new Date().getTime() / 1000)) / (parseInt(vault.vestingEnd) - parseInt(vault.vestingStart));
+  vestingRate = Math.max(0, Math.min(1, vestingRate));
 
   // Pie chart data
   const pieData = vault ? [
     {
-      name: 'Vault Assets',
+      name: 'Assets in Vault',
       value: formatNumber(vault.totalAssets, vault.decimals),
     },
     {
@@ -134,7 +136,7 @@ export default function VaultDetailPage() {
   const sharesData = vault ? (() => {
     // Calculate shares held by vault (locked shares in positions)
     const totalShares = formatNumber(vault.totalShares, vault.decimals);
-    const sharesUnlocked = formatNumber(vault.totalSharesUnlocked, vault.decimals);
+    const sharesUnlocked = totalSupply - totalShares;
     const sharesVested = totalShares * (1 - vestingRate);
     const sharesLocked = totalShares - sharesUnlocked - sharesVested;
     // Shares not held by vault (unlocked/released shares)
@@ -142,7 +144,7 @@ export default function VaultDetailPage() {
 
     return [
       {
-        name: 'Shares Locked',
+        name: 'Shares in Vault',
         value: sharesLocked,
       },
       {
@@ -222,7 +224,7 @@ export default function VaultDetailPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-5 gap-4 mb-8">
+          <div className="grid md:grid-cols-6 gap-4 mb-8">
             <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Assets</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalAssets.toFixed(2)}</p>
@@ -242,6 +244,10 @@ export default function VaultDetailPage() {
             <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Price Per Share</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{pricePerShare.toFixed(2)}</p>
+            </div>
+            <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Supply</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalSupply.toFixed(2)}</p>
             </div>
           </div>
 

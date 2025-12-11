@@ -96,7 +96,7 @@ export const GET_STAK_VAULT = `
       totalAssets
       investedAssets
       totalShares
-      totalSharesUnlocked
+      totalSupply
       positionCount
       createdAt
       updatedAt
@@ -108,6 +108,7 @@ export const GET_STAK_VAULT = `
         shareAmount
         sharesUnlocked
         assetsDivested
+        vestingAmount
         isClosed
         createdAt
         updatedAt

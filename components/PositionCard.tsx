@@ -12,6 +12,7 @@ interface StakPosition {
     shareAmount: string;
     sharesUnlocked: string;
     assetsDivested: string;
+    vestingAmount: string;
     isClosed: boolean;
     createdAt: string;
 }
@@ -30,7 +31,8 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
     const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
     
     const positionShare = formatNumber(position.shareAmount, vaultDecimals);
-    const divestibleShares = parseFloat((positionShare * vestingRate) + "");
+    const vestingAmount = formatNumber(position.vestingAmount, vaultDecimals);
+    const divestibleShares = parseFloat((vestingAmount * vestingRate) - (vestingAmount - positionShare) + "");
     const vestedShares = parseFloat((positionShare * (1 - vestingRate)) + "").toFixed(2);
     const currentValue = (positionShare * pricePerShare).toFixed(2);
 
@@ -72,14 +74,14 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
             {/* Main Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets Invested</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {formatNumber(position.assetAmount, vaultDecimals).toFixed(2)}
                     </p>
                 </div>
                 
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Shares Locked</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Shares</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {formatNumber(position.shareAmount, vaultDecimals).toFixed(2)}
                     </p>

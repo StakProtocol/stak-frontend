@@ -7,7 +7,7 @@ import { Navbar } from '@/components/Navbar';
 import { useAccount } from 'wagmi';
 import { writeContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config } from '@/lib/wagmi';
-import { parseEther } from 'viem';
+import { parseUnits } from 'viem';
 import FactoryStakVaultABI from '@/app/abis/FactoryStakVault.json';
 
 export default function NewVaultPage() {
@@ -57,7 +57,7 @@ export default function NewVaultPage() {
           formData.symbol,
           formData.owner as `0x${string}`,
           formData.treasury as `0x${string}`,
-          parseEther(formData.performanceRate),
+          parseUnits(formData.performanceRate, 2),
           BigInt(Math.floor(new Date(formData.vestingStart).getTime() / 1000)),
           BigInt(Math.floor(new Date(formData.vestingEnd).getTime() / 1000)),
         ],
@@ -180,9 +180,9 @@ export default function NewVaultPage() {
                 value={formData.performanceRate}
                 onChange={(e) => handleInputChange('performanceRate', e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                placeholder="0.1"
+                placeholder="10"
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Performance fee rate (e.g., 0.1 for 10%)</p>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Performance fee rate (e.g., 10 for 10%)</p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
