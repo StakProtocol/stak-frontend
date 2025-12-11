@@ -41,9 +41,8 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
     const assetsDivested = formatNumber(position.assetsDivested, vaultDecimals);
     const initialValue = initialAssets - assetsDivested;
 
-    const positionAssets = formatNumber(position.assetAmount, vaultDecimals);
     const sharesUnlocked = formatNumber(position.sharesUnlocked, vaultDecimals);
-    const finalValue = positionAssets + (positionShare + sharesUnlocked) * pricePerShare;
+    const finalValue = (positionShare + sharesUnlocked) * pricePerShare;
 
     const profitLoss = parseFloat(finalValue + "") - parseFloat(initialValue + "");
     const profitLossPercentage = initialValue > 0 ? ((profitLoss / initialValue) * 100).toFixed(2) : "0.00";
