@@ -106,7 +106,7 @@ export default function VaultDetailPage() {
     );
   }
 
-  const totalAssets = formatNumber(vault.totalAssets, vault.decimals) + formatNumber(vault.investedAssets, vault.decimals) - formatNumber(vault.totalPerformanceFees, "4");
+  const totalAssets = formatNumber(vault.totalAssets, vault.decimals) + formatNumber(vault.investedAssets, vault.decimals) - formatNumber(vault.totalPerformanceFees, vault.decimals);
   const investedAssets = formatNumber(vault.investedAssets, vault.decimals);
   const totalShares = formatNumber(vault.totalShares, vault.decimals);
   const totalSupply = formatNumber(vault.totalSupply, vault.decimals);
@@ -129,7 +129,7 @@ export default function VaultDetailPage() {
     },
     {
       name: 'Performance Fees',
-      value: formatNumber(vault.totalPerformanceFees, "4"),
+      value: formatNumber(vault.totalPerformanceFees, vault.decimals),
     },
   ] : [];
 
