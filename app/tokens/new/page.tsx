@@ -74,7 +74,7 @@ export default function NewTokenPage() {
       // Filter out empty strings
       const acceptedAssets = formData.acceptedAssets.filter(a => a.trim() !== '');
       const priceFeeds = formData.priceFeeds.filter(p => p.trim() !== '');
-      const frequencies = formData.frequencies.filter(f => f.trim() !== '').map(f => parseEther(f));
+      const frequencies = formData.frequencies.filter(f => f.trim() !== '').map(f => BigInt(f));
 
       // Note: You'll need to set the factory contract address
       const factoryAddress = process.env.NEXT_PUBLIC_FACTORY_FLYING_ICO_ADDRESS as `0x${string}`;
@@ -92,8 +92,8 @@ export default function NewTokenPage() {
         args: [
           formData.name,
           formData.symbol,
-          parseEther(formData.tokenCap),
-          parseEther(formData.tokensPerUsd),
+          BigInt(formData.tokenCap),
+          BigInt(formData.tokensPerUsd),
           acceptedAssets as `0x${string}`[],
           priceFeeds as `0x${string}`[],
           frequencies,
