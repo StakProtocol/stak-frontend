@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Navbar } from '@/components/Navbar';
 import { graphqlClient, GET_STAK_VAULTS } from '@/lib/graphql';
-import { formatNumber, formatAddress } from '../utils/helper';
+import { formatNumber, formatAddress, EXCLUDED_VAULT_ADDRESSES } from '../utils/helper';
 
 interface StakVault {
   id: string;
@@ -28,7 +28,11 @@ export default function VaultsPage() {
     async function fetchVaults() {
       try {
         const data = await graphqlClient.request<{ stakVaults: StakVault[] }>(GET_STAK_VAULTS);
-        setVaults(data.stakVaults);
+        // Filter out excluded Vault addresses
+        const filteredVaults = data.stakVaults.filter(
+          (vault) => !EXCLUDED_VAULT_ADDRESSES.includes(vault.id.toLowerCase())
+        );
+        setVaults(filteredVaults);
       } catch (error) {
         console.error('Error fetching vaults:', error);
       } finally {

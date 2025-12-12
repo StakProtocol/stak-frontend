@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Navbar } from '@/components/Navbar';
 import { graphqlClient, GET_FLYING_ICOS } from '@/lib/graphql';
 import { getTokenPicture } from '@/app/utils/logos';
+import { EXCLUDED_ICO_ADDRESSES } from '@/app/utils/helper';
 
 interface AcceptedAsset {
   id: string;
@@ -40,7 +41,11 @@ export default function TokensPage() {
     async function fetchICOs() {
       try {
         const data = await graphqlClient.request<{ flyingICOs: FlyingICO[] }>(GET_FLYING_ICOS);
-        setIcos(data.flyingICOs);
+        // Filter out excluded ICO addresses
+        const filteredIcos = data.flyingICOs.filter(
+          (ico) => !EXCLUDED_ICO_ADDRESSES.includes(ico.id.toLowerCase())
+        );
+        setIcos(filteredIcos);
       } catch (error) {
         console.error('Error fetching ICOs:', error);
       } finally {
