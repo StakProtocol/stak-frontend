@@ -32,6 +32,7 @@ interface AcceptedAsset {
   symbol: string;
   decimals: string;
   totalAssets: string;
+  backingAssets: string;
 }
 
 interface FlyingICO {
@@ -262,48 +263,95 @@ export default function TokenDetailPage() {
           </div>
 
           {/* Accepted Assets Panel */}
-          {ico.acceptedAssets && ico.acceptedAssets.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Backing Assets</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {ico.acceptedAssets.map((asset) => {
-                  const picturePath = getTokenPicture("sepolia", asset.address);
-                  const decimals = asset.decimals ? parseInt(asset.decimals) : 18;
-                  const totalAssetsFormatted = formatNumber(asset.totalAssets, decimals.toString());
-                  const symbol = asset.symbol || 'UNKNOWN';
-                  
-                  return (
-                    <div
-                      key={asset.id}
-                      className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4 flex items-center gap-4"
-                    >
-                      <div className="flex-shrink-0">
-                        <Image
-                          src={picturePath}
-                          alt={symbol}
-                          width={40}
-                          height={40}
-                          className="rounded-full"
-                        />
-                      </div>
+          {ico.acceptedAssets && ico.acceptedAssets.length > 0 && (() => {
+            const assetsWithData = ico.acceptedAssets.map((asset) => {
+              const picturePath = getTokenPicture("sepolia", asset.address);
+              const decimals = asset.decimals ? parseInt(asset.decimals) : 18;
+              const totalAssetsFormatted = formatNumber(asset.totalAssets, decimals.toString());
+              const backingAssetsFormatted = formatNumber(asset.backingAssets, decimals.toString());
+              const symbol = asset.symbol || 'UNKNOWN';
+              const percentage = totalAssetsFormatted > 0 ? (backingAssetsFormatted / totalAssetsFormatted) * 100 : 0;
 
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                          {symbol}
-                        </p>
-                        <p className="text-xl font-bold text-gray-900 dark:text-white truncate">
-                          {totalAssetsFormatted.toLocaleString(undefined, { 
-                            minimumFractionDigits: 2, 
-                            maximumFractionDigits: 6 
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
+              return {
+                ...asset,
+                picturePath,
+                decimals,
+                totalAssetsFormatted,
+                backingAssetsFormatted,
+                symbol,
+                percentage,
+              };
+            });
+
+            return (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Backing Assets</h2>
+                <div className="bg-white dark:bg-primary/40 rounded-2xl shadow-lg p-6">
+                  <div className="space-y-4">
+                    {assetsWithData.map((asset, index) => {
+                      const barWidth = Math.min(100, Math.max(0, asset.percentage));
+                      
+                      return (
+                        <div
+                          key={asset.id}
+                          className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-primary dark:to-gray-800/50 p-4 transition-all duration-300 hover:shadow-md hover:scale-[1.01]"
+                        >
+                          <div className="flex items-center gap-4">
+                            {/* Token Icon */}
+                            <div className="flex-shrink-0 relative">
+                              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                              <Image
+                                src={asset.picturePath}
+                                alt={asset.symbol}
+                                width={48}
+                                height={48}
+                                className="rounded-full relative z-10 ring-2 ring-white dark:ring-gray-700"
+                              />
+                            </div>
+
+                            {/* Asset Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-3">
+                                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    {asset.symbol}
+                                  </h3>
+                                </div>
+                                <p className="text-lg font-bold text-gray-900 dark:text-white">
+                                  {asset.backingAssetsFormatted.toLocaleString(undefined, { 
+                                    minimumFractionDigits: 2, 
+                                    maximumFractionDigits: 6 
+                                  })}
+                                  { " / " }
+                                  {asset.totalAssetsFormatted.toLocaleString(undefined, { 
+                                    minimumFractionDigits: 2, 
+                                    maximumFractionDigits: 6 
+                                  })}
+                                </p>
+                              </div>
+                              
+                              {/* Visual Progress Bar */}
+                              <div className="relative w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div
+                                  className="absolute left-0 top-0 h-full rounded-full transition-all duration-500 ease-out"
+                                  style={{
+                                    width: `${barWidth}%`,
+                                    background: `linear-gradient(90deg, ${COLORS[index % COLORS.length]}, ${COLORS[(index + 1) % COLORS.length]})`,
+                                  }}
+                                >
+                                  <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Pie Charts */}
           <div className="mb-8">

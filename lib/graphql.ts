@@ -61,6 +61,7 @@ export const GET_FLYING_ICO = `
         symbol
         decimals
         totalAssets
+        backingAssets
       }
       positions(first: 100, orderBy: createdAt, orderDirection: desc) {
         id
