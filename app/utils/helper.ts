@@ -14,6 +14,5 @@ export const EXCLUDED_ICO_ADDRESSES: string[] = [
 
 // List of Vault addresses that should not be displayed
 export const EXCLUDED_VAULT_ADDRESSES: string[] = [
-    // Add Vault addresses to exclude here
-    // Example: '0x1234567890123456789012345678901234567890',
+    '0xfe6f7004bfb4bc368846e44843875f09396d306e'
 ];

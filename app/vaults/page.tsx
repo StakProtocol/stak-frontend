@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Navbar } from '@/components/Navbar';
 import { graphqlClient, GET_STAK_VAULTS } from '@/lib/graphql';
 import { formatNumber, formatAddress, EXCLUDED_VAULT_ADDRESSES } from '../utils/helper';
+import { getTokenPicture } from '../utils/logos';
 
 interface StakVault {
   id: string;
@@ -79,13 +80,13 @@ export default function VaultsPage() {
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white">{vault.name}</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">{vault.symbol}</p>
                       </div>
-                      <div className="w-12 h-12 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center">
                         <Image
-                          className="object-cover w-12 h-12"
-                          src="/tokens/usdc.png"
-                          alt="Stak Protocol Logo"
-                          width={100}
-                          height={100}
+                          src={getTokenPicture('sepolia', vault.asset)}
+                          alt={vault.symbol}
+                          width={32}
+                          height={32}
+                          className="rounded-full"
                         />
                       </div>
                     </div>
