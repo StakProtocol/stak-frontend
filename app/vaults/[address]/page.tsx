@@ -375,13 +375,15 @@ export default function VaultDetailPage() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey="time"
-                    tick={{ fontSize: 12 }}
+                    tick={{ fontSize: 12, fill: "#99a1af" }}
                     angle={-45}
                     textAnchor="end"
+                    stroke='#99a1af'
                     height={80}
                   />
                   <YAxis
-                    label={{ angle: -90, position: 'insideLeft' }}
+                    label={{ angle: -90, position: 'insideLeft', fill: "#99a1af" }}
+                    stroke='#99a1af'
                   />
                   <Tooltip
                     formatter={(value: number) => value.toFixed(2)}

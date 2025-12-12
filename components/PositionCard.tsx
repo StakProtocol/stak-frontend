@@ -54,7 +54,7 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                         Position #{position.positionId}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -95,14 +95,14 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
             <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                         {formatNumber(position.assetAmount, vaultDecimals).toFixed(2)}
                     </p>
                 </div>
                 
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Shares</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                         {formatNumber(position.shareAmount, vaultDecimals).toFixed(2)}
                     </p>
                 </div>
@@ -111,14 +111,14 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
             <div className="border-t border-gray-700 pt-4 grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets Divested</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                         {formatNumber(position.assetsDivested, vaultDecimals).toFixed(2)}
                     </p>
                 </div>
 
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Shares Unlocked</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                         {formatNumber(position.sharesUnlocked, vaultDecimals).toFixed(2)}
                     </p>
                 </div>
@@ -127,14 +127,14 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
             <div className="border-t border-gray-700 pt-4 grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Divestible Shares</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                         {divestibleShares.toFixed(2)}
                     </p>
                 </div>
 
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Vested Shares</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                         {vestedShares}
                     </p>
                 </div>

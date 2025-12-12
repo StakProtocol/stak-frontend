@@ -476,13 +476,15 @@ export default function TokenDetailPage() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey="time"
-                    tick={{ fontSize: 12 }}
+                    tick={{ fontSize: 12, fill: "#99a1af" }}
                     angle={-45}
+                    stroke='#99a1af'
                     textAnchor="end"
                     height={80}
                   />
                   <YAxis
-                    label={{ angle: -90, position: 'insideLeft' }}
+                    label={{ angle: -90, position: 'insideLeft', fill: "#99a1af" }}
+                    stroke='#99a1af'
                   />
                   <Tooltip
                     formatter={(value: number) => value.toFixed(2)}
@@ -605,14 +607,14 @@ export default function TokenDetailPage() {
                       <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
                         <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                           <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Asset Amount</p>
-                          <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                          <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                             {assetAmount.toFixed(2)}
                           </p>
                         </div>
                         
                         <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                           <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Token Amount</p>
-                          <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                          <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                             {tokenAmount.toFixed(2)}
                           </p>
                         </div>
@@ -621,13 +623,13 @@ export default function TokenDetailPage() {
                       <div className="border-t border-gray-200 dark:border-gray-700 pt-4 grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
                         <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                           <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Divestible Tokens</p>
-                          <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                          <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                             {divestibleTokens.toFixed(2)}
                           </p>
                         </div>
                         <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                           <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Vested Tokens</p>
-                          <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                          <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                             {vestedTokens.toFixed(2)}
                           </p>
                         </div>
