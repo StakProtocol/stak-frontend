@@ -6,20 +6,20 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useChainId } from 'wagmi';
 
-import { ConnectButton } from "thirdweb/react";
+import { ConnectButton, darkTheme } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
 import { createThirdwebClient, defineChain } from "thirdweb";
 
 const client = createThirdwebClient({ clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID! });
 const customChain = defineChain({
-    id: Number(process.env.NEXT_PUBLIC_NETWORK_ID!),
-    name: "Sepolia Ethereum",
-    rpc: process.env.NEXT_PUBLIC_SEPOLIA_RPC!,
-    nativeCurrency: {
-        name: "ETH",
-        symbol: "ETH",
-        decimals: 18
-    }
+  id: Number(process.env.NEXT_PUBLIC_NETWORK_ID!),
+  name: "Sepolia Ethereum",
+  rpc: process.env.NEXT_PUBLIC_SEPOLIA_RPC!,
+  nativeCurrency: {
+    name: "ETH",
+    symbol: "ETH",
+    decimals: 18
+  }
 })
 
 export function Navbar() {
@@ -84,6 +84,22 @@ export function Navbar() {
                 createWallet("com.coinbase.wallet"),
                 createWallet("me.rainbow"),
               ]}
+              theme={darkTheme({
+                colors: {
+                  primaryButtonBg: "#0e444c",
+                  primaryButtonText: "#ffffff",
+                  connectedButtonBg: "#042024ff",
+                  connectedButtonBgHover: "#052d33ff",
+                  secondaryIconColor: "hsl(0, 0%, 63%)",
+                },
+              })}
+              connectModal={{
+                showThirdwebBranding: false,
+                size: "compact",
+                title: "Connect wallet",
+                titleIcon: "https://app.stak.fund/icons/logo.png",
+              }}
+              connectButton={{ label: "Connect wallet" }}
             />
           </div>
 
@@ -159,6 +175,22 @@ export function Navbar() {
                   createWallet("com.coinbase.wallet"),
                   createWallet("me.rainbow"),
                 ]}
+                theme={darkTheme({
+                  colors: {
+                    primaryButtonBg: "#0e444c",
+                    primaryButtonText: "#ffffff",
+                    connectedButtonBg: "#042024ff",
+                    connectedButtonBgHover: "#052d33ff",
+                    secondaryIconColor: "hsl(0, 0%, 63%)",
+                  },
+                })}
+                connectModal={{
+                  showThirdwebBranding: false,
+                  size: "compact",
+                  title: "Connect wallet",
+                  titleIcon: "https://app.stak.fund/icons/logo.png",
+                }}
+                connectButton={{ label: "Connect wallet" }}
               />
             </div>
           </div>
