@@ -9,6 +9,7 @@ import { getTokenPicture } from '@/app/utils/logos';
 
 interface AcceptedAsset {
   id: string;
+  address: string;
   symbol: string;
   decimals: string;
   totalAssets: string;
