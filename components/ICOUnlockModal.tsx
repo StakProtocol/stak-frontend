@@ -148,7 +148,7 @@ export function ICOUnlockModal({
               step="any"
               max={maxTokens}
               disabled={isUnlocking}
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2fc7a8] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <button
               onClick={handleMax}
@@ -196,7 +196,7 @@ export function ICOUnlockModal({
           <button
             onClick={handleUnlock}
             disabled={!isValidAmount() || isUnlocking}
-            className="flex-1 cursor-pointer px-4 py-3 bg-[#2fc7a8]/60 hover:bg-[#2fc7a8]/80 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+            className="flex-1 cursor-pointer px-4 py-3 bg-primary/60 hover:bg-primary/80 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
           >
             {isUnlocking ? 'Unlocking...' : 'Unlock'}
           </button>

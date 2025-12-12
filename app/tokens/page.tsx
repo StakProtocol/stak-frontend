@@ -58,7 +58,7 @@ export default function TokensPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-secondary-dark/5 dark:to-black">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
@@ -67,7 +67,7 @@ export default function TokensPage() {
           </h1>
           <Link
             href="/tokens/new"
-            className="px-6 py-3 bg-dark-primary/30 border border-secondary hover:bg-secondary-dark/10 text-secondary font-semibold rounded-lg font-medium transition-colors"
+            className="px-6 py-3 bg-dark-primary/30 border border-red hover:bg-dark-primary text-primary font-semibold rounded-lg font-medium transition-colors"
           >
             Launch New ICO
           </Link>
@@ -75,24 +75,24 @@ export default function TokensPage() {
 
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             <p className="mt-4 text-gray-600 dark:text-white">Loading ICOs...</p>
           </div>
         ) : icos.length === 0 ? (
-          <div className="text-center py-12 bg-white dark:bg-secondary-dark/5 rounded-2xl shadow-lg">
+          <div className="text-center py-12 bg-white dark:bg-dark-primary rounded-2xl shadow-lg">
             <p className="text-gray-600 font-medium dark:text-gray-200 text-lg">No ICOs found</p>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {icos.map((ico) => (
               <Link key={ico.id} href={`/tokens/${ico.id}`}>
-                <div className="bg-white dark:bg-secondary-dark/5 rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all border-2 border-gray-200 dark:border-gray-700 hover:border-secondary">
+                <div className="bg-white dark:bg-dark-primary rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all border-2 border-gray-200 dark:border-gray-700 hover:border-primary">
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="text-xl font-bold text-gray-900 dark:text-white">{ico.name}</h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">{ico.symbol}</p>
                     </div>
-                    <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center">
+                    <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
                       <span className="text-black font-bold text-lg">{ico.symbol[0]}</span>
                     </div>
                   </div>

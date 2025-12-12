@@ -148,7 +148,7 @@ export function ICODivestModal({
               step="any"
               max={maxTokens}
               disabled={isDivesting}
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <button
               onClick={handleMax}
@@ -196,7 +196,7 @@ export function ICODivestModal({
           <button
             onClick={handleDivest}
             disabled={!isValidAmount() || isDivesting}
-            className="flex-1 px-4 py-3 cursor-pointer bg-secondary/60 hover:bg-secondary/80 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+            className="flex-1 px-4 py-3 cursor-pointer bg-primary/60 hover:bg-primary/80 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
           >
             {isDivesting ? 'Divesting...' : 'Divest'}
           </button>

@@ -259,7 +259,7 @@ export default function FaucetPage() {
               {tokens.map((token) => (
               <div
                 key={token.symbol}
-                className="bg-white dark:bg-secondary-dark/5 rounded-xl p-6 shadow-lg border-2 border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all"
+                className="bg-white dark:bg-dark-primary/70 rounded-xl p-6 shadow-lg border-2 border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-primary/70 transition-all"
               >
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
@@ -303,7 +303,7 @@ export default function FaucetPage() {
                 <button
                   onClick={() => handleClaim(token)}
                   disabled={claiming === token.symbol}
-                  className="w-full px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full px-4 py-3 bg-primary/50 hover:bg-primary/70 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {claiming === token.symbol ? (
                     <span className="flex items-center justify-center gap-2">
@@ -321,7 +321,7 @@ export default function FaucetPage() {
         )}
 
         {tokens.length > 0 && (
-          <div className="mt-8 bg-white dark:bg-secondary-dark/5 rounded-xl p-6 shadow-lg border-2 border-gray-200 dark:border-gray-700">
+          <div className="mt-8 bg-white dark:bg-dark-primary/50 rounded-xl p-6 shadow-lg border-2 border-gray-200 dark:border-gray-700">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
               Faucet Contract
             </h2>
@@ -334,7 +334,7 @@ export default function FaucetPage() {
                 href={`${chain.blockExplorerUrl}/address/${FAUCET_ADDRESS}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-secondary hover:underline"
+                className="text-sm text-primary/70 hover:underline"
               >
                 View on Explorer
               </a>

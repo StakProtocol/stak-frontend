@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount, useChainId } from 'wagmi';
-import { readContract, writeContract, waitForTransactionReceipt } from '@wagmi/core';
+import { getBalance, readContract, writeContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config } from '@/lib/wagmi';
 import { parseUnits, formatUnits, erc20Abi, type Address } from 'viem';
 import FlyingICOABI from '@/app/abis/FlyingICO.json';
@@ -48,6 +48,7 @@ export function PurchaseModal({
   const [txHash, setTxHash] = useState<string>('');
 
   const selectedAsset = acceptedAssets.find(asset => asset.address.toLowerCase() === selectedAssetAddress.toLowerCase());
+  const selectedETH = selectedAsset?.address === "0x0000000000000000000000000000000000000000"
 
   // Load wallet balance and allowance when asset is selected
   useEffect(() => {
@@ -57,24 +58,33 @@ export function PurchaseModal({
       try {
         if (!userAddress || !selectedAsset) return;
 
-        // Get wallet balance
-        const balance = await readContract(config, {
-          address: selectedAssetAddress as Address,
-          abi: erc20Abi,
-          functionName: 'balanceOf',
-          args: [userAddress],
-        });
+        let balance;
+        let currentAllowance;
+
+        if (selectedETH) {
+          let ethBalance = await getBalance(config, { address: userAddress })
+          balance = ethBalance.value
+          currentAllowance = 0
+        } else {
+          // Get wallet balance
+          balance = await readContract(config, {
+            address: selectedAssetAddress as Address,
+            abi: erc20Abi,
+            functionName: 'balanceOf',
+            args: [userAddress],
+          });
+
+          // Get allowance
+          currentAllowance = await readContract(config, {
+            address: selectedAssetAddress as Address,
+            abi: erc20Abi,
+            functionName: 'allowance',
+            args: [userAddress, icoAddress],
+          });
+        }
+
         setWalletBalance(balance as bigint);
-
-        // Get allowance
-        const currentAllowance = await readContract(config, {
-          address: selectedAssetAddress as Address,
-          abi: erc20Abi,
-          functionName: 'allowance',
-          args: [userAddress, icoAddress],
-        });
         setAllowance(currentAllowance as bigint);
-
         setSymbol(selectedAsset.symbol);
       } catch (error) {
         console.error('Error loading balance/allowance:', error);
@@ -93,7 +103,7 @@ export function PurchaseModal({
 
     try {
       const amountBN = parseUnits(investAmount, Number(selectedAsset.decimals));
-      if (allowance >= amountBN) {
+      if (selectedETH || allowance >= amountBN) {
         setStep('invest');
       } else {
         setStep('approve');
@@ -109,12 +119,12 @@ export function PurchaseModal({
     setIsApproving(true);
     setTxStatus('Waiting for wallet confirmation...');
     setTxHash('');
-    
+
     try {
       const amountBN = parseUnits(investAmount, Number(selectedAsset.decimals));
-      
+
       toast.loading('Please confirm the approval transaction in your wallet', { id: 'approve' });
-      
+
       const hash = await writeContract(config, {
         address: selectedAssetAddress as Address,
         abi: erc20Abi,
@@ -144,7 +154,7 @@ export function PurchaseModal({
       setTxHash('');
     } catch (error: any) {
       console.error('Approval error:', error);
-      const errorMessage = error?.message?.includes('User rejected') 
+      const errorMessage = error?.message?.includes('User rejected')
         ? 'Approval cancelled'
         : 'Approval failed. Please try again.';
       toast.error(errorMessage, { id: 'approve' });
@@ -161,18 +171,29 @@ export function PurchaseModal({
     setIsInvesting(true);
     setTxStatus('Waiting for wallet confirmation...');
     setTxHash('');
-    
+
     try {
       const amountBN = parseUnits(investAmount, Number(selectedAsset.decimals));
 
       toast.loading('Please confirm the investment transaction in your wallet', { id: 'invest' });
+      let hash;
 
-      const hash = await writeContract(config, {
-        address: icoAddress,
-        abi: FlyingICOABI,
-        functionName: 'investERC20',
-        args: [selectedAssetAddress as Address, amountBN],
-      });
+      if (selectedETH) {
+        hash = await writeContract(config, {
+          address: icoAddress,
+          abi: FlyingICOABI,
+          functionName: 'investEther',
+          args: [],
+          value: amountBN
+        })
+      } else {
+        hash = await writeContract(config, {
+          address: icoAddress,
+          abi: FlyingICOABI,
+          functionName: 'investERC20',
+          args: [selectedAssetAddress as Address, amountBN],
+        });
+      }
 
       setTxHash(hash);
       setTxStatus('Transaction submitted. Waiting for confirmation...');
@@ -238,7 +259,7 @@ export function PurchaseModal({
 
   const balanceFormatted = selectedAsset ? formatNumber(walletBalance.toString(), selectedAsset.decimals) : 0;
   const allowanceFormatted = selectedAsset ? formatNumber(allowance.toString(), selectedAsset.decimals) : 0;
-  const needsApproval = selectedAsset && investAmount && parseUnits(investAmount || '0', Number(selectedAsset.decimals)) > allowance;
+  const needsApproval = !selectedETH && selectedAsset && investAmount && parseUnits(investAmount || '0', Number(selectedAsset.decimals)) > allowance;
 
   const isValidAmount = () => {
     if (!investAmount || !selectedAsset) return false;
@@ -275,7 +296,7 @@ export function PurchaseModal({
               value={selectedAssetAddress}
               onChange={(e) => setSelectedAssetAddress(e.target.value)}
               disabled={isApproving || isInvesting}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#FF69B4] disabled:opacity-50 disabled:cursor-not-allowed appearance-none pr-10"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed appearance-none pr-10"
             >
               {acceptedAssets.map((asset) => (
                 <option key={asset.id} value={asset.address}>
@@ -326,7 +347,7 @@ export function PurchaseModal({
               placeholder="0.00"
               step="any"
               disabled={isApproving || isInvesting || !selectedAsset}
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#FF69B4] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <button
               onClick={handleMax}
@@ -347,11 +368,11 @@ export function PurchaseModal({
         {selectedAsset && (
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
-              <div className={`flex-1 text-center py-2 ${step === 'approve' ? 'bg-[#FF69B4]/20 text-[#FF69B4]' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'} rounded-lg transition-colors`}>
+              <div className={`flex-1 text-center py-2 ${step === 'approve' ? 'bg-primary/20 text-primary' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'} rounded-lg transition-colors`}>
                 <span className="font-medium">1. Approve</span>
               </div>
               <div className="w-4 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
-              <div className={`flex-1 text-center py-2 ${step === 'invest' ? 'bg-[#FF69B4]/20 text-[#FF69B4]' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'} rounded-lg transition-colors`}>
+              <div className={`flex-1 text-center py-2 ${step === 'invest' ? 'bg-primary/20 text-primary' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'} rounded-lg transition-colors`}>
                 <span className="font-medium">2. Invest</span>
               </div>
             </div>
@@ -390,7 +411,7 @@ export function PurchaseModal({
             <button
               onClick={handleApprove}
               disabled={!isValidAmount() || isApproving}
-              className="flex-1 px-4 py-3 bg-[#FF69B4] hover:bg-[#FF1493] cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+              className="flex-1 px-4 py-3 bg-primary/20 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
             >
               {isApproving ? 'Approving...' : 'Approve'}
             </button>
@@ -398,7 +419,7 @@ export function PurchaseModal({
             <button
               onClick={handleInvest}
               disabled={!isValidAmount() || isInvesting}
-              className="flex-1 px-4 py-3 bg-[#FF69B4] hover:bg-[#FF1493] cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+              className="flex-1 px-4 py-3 bg-primary/60 hover:bg-primary/80 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
             >
               {isInvesting ? 'Investing...' : 'Invest'}
             </button>

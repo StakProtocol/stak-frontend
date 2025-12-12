@@ -30,6 +30,7 @@ export function Navbar() {
   const navigation = [
     { name: 'Flying ICOs', href: '/tokens' },
     { name: 'Stak Vaults', href: '/vaults' },
+    { name: 'Faucet', href: '/faucet' },
   ];
 
   return (
@@ -69,16 +70,6 @@ export function Navbar() {
 
           {/* Desktop Wallet Connect Button and Testnet Badge */}
           <div className="hidden md:flex md:items-center md:gap-4">
-            <Link
-              href="/faucet"
-              className={`inline-flex items-center px-3 py-2 text-lg font-medium rounded-md transition-colors
-                ${pathname === '/faucet'
-                  ? 'text-gray-900 dark:text-white underline'
-                  : 'text-gray-600 dark:text-white dark:hover:text-primary'
-                }`}
-            >
-              Faucet
-            </Link>
             {chainId === 11155111 && (
               <div className="px-4 py-1 dark:bg-primary/20 text-blue-800 dark:text-primary text-md font-medium rounded-full">
                 <span>Sepolia Testnet</span>
@@ -156,16 +147,6 @@ export function Navbar() {
                 {item.name}
               </Link>
             ))}
-            <Link
-              href="/faucet"
-              className={`block px-3 py-2 text-base font-medium ${pathname === '/faucet'
-                ? 'text-gray-900 dark:text-white underline'
-                : 'text-gray-600 dark:text-white dark:hover:text-primary'
-                }`}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Faucet
-            </Link>
           </div>
           <div className="pt-4 pb-3 border-t border-gray-200 dark:border-primary">
             <div className="px-3 space-y-3 right">

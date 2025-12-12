@@ -106,11 +106,11 @@ export default function TokenDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
         <Navbar />
         <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading ICO details...</p>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="mt-4 text-gray-600 dark:text-white">Loading ICO details...</p>
         </div>
       </div>
     );
@@ -118,11 +118,11 @@ export default function TokenDetailPage() {
 
   if (!ico) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
         <Navbar />
         <div className="text-center py-12">
-          <p className="text-gray-600 dark:text-gray-400">ICO not found</p>
-          <Link href="/tokens" className="mt-4 inline-block text-blue-600 hover:text-blue-700">
+          <p className="text-gray-600 dark:text-white">ICO not found</p>
+          <Link href="/tokens" className="mt-4 inline-block text-primary hover:text-primary/70">
             Back to ICOs
           </Link>
         </div>
@@ -219,14 +219,14 @@ export default function TokenDetailPage() {
   })() : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/tokens" className="text-blue-600 hover:text-blue-700 mb-4 inline-block">
+        <Link href="/tokens" className="text-primary hover:text-primary/70 mb-4 inline-block">
           ← Back to ICOs
         </Link>
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8">
+        <div className="bg-white dark:bg-primary/40 rounded-2xl shadow-lg p-8 mb-8">
           <div className="flex items-start justify-between mb-6">
             <div>
               <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{ico.name}</h1>
@@ -243,19 +243,19 @@ export default function TokenDetailPage() {
           </div>
 
           <div className="grid md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
+            <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Token Cap</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(ico.tokenCap, "0")}</p>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
+            <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Supply</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(ico.totalSupply).toFixed(2)}</p>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
+            <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Tokens Per USD</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(ico.tokensPerUsd, "0")}</p>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
+            <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Positions</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{ico.positionCount}</p>
             </div>
@@ -275,7 +275,7 @@ export default function TokenDetailPage() {
                   return (
                     <div
                       key={asset.id}
-                      className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 flex items-center gap-4"
+                      className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4 flex items-center gap-4"
                     >
                       <div className="flex-shrink-0">
                         <Image
@@ -595,7 +595,7 @@ export default function TokenDetailPage() {
                           </div>
                           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                             <div
-                              className="bg-gradient-to-r from-[#FF69B4] to-[#2fc7a8] h-2 rounded-full transition-all duration-300"
+                              className="bg-gradient-to-r from-primary to-green-800 h-2 rounded-full transition-all duration-300"
                               style={{ width: `${(1 - positionVestingRate) * 100}%` }}
                             ></div>
                           </div>
