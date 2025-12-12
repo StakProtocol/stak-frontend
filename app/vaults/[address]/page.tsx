@@ -110,7 +110,7 @@ export default function VaultDetailPage() {
   const investedAssets = formatNumber(vault.investedAssets, vault.decimals);
   const totalShares = formatNumber(vault.totalShares, vault.decimals);
   const totalSupply = formatNumber(vault.totalSupply, vault.decimals);
-  const pricePerShare = totalAssets / totalSupply;
+  const pricePerShare = totalSupply > 0 ? totalAssets / totalSupply : 1.00;
   // Calculate utilization rate
   const utilizationRate = totalAssets > 0 ? (investedAssets / totalAssets) * 100 : 0;
 

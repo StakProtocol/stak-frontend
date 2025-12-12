@@ -237,7 +237,7 @@ export function DepositModal({
   const balanceFormatted = formatNumber(walletBalance.toString(), assetDecimals);
   const allowanceFormatted = formatNumber(allowance.toString(), assetDecimals);
   const needsApproval = depositAmount && parseUnits(depositAmount || '0', Number(assetDecimals)) > allowance;
-  const previewSharesFormatted = previewShares > 0 ? formatNumber(previewShares.toString(), "18") : 0;
+  const previewSharesFormatted = previewShares > 0 ? formatNumber(previewShares.toString(), assetDecimals) : 0;
 
   return (
     <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50" onClick={onClose}>
