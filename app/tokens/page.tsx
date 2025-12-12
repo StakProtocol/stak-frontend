@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Navbar } from '@/components/Navbar';
 import { graphqlClient, GET_FLYING_ICOS } from '@/lib/graphql';
+import { getTokenPicture } from '@/app/utils/logos';
 
 interface AcceptedAsset {
   id: string;
@@ -92,8 +94,14 @@ export default function TokensPage() {
                       <h3 className="text-xl font-bold text-gray-900 dark:text-white">{ico.name}</h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">{ico.symbol}</p>
                     </div>
-                    <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-                      <span className="text-black font-bold text-lg">{ico.symbol[0]}</span>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                      <Image
+                        src={getTokenPicture('sepolia', formatAddress(ico.id))}
+                        alt={ico.symbol}
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
                     </div>
                   </div>
                   
@@ -103,19 +111,31 @@ export default function TokensPage() {
                       <span className="font-semibold text-gray-900 dark:text-white">{formatNumber(ico.tokenCap, 0)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">Total Assets:</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">{formatNumber(ico.tokensUnlocked)}</span>
+                      <span className="text-gray-600 dark:text-gray-300">Total Supply:</span>
+                      <span className="font-semibold text-gray-900 dark:text-white">{formatNumber(ico.totalSupply)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-300">Positions:</span>
                       <span className="font-semibold text-gray-900 dark:text-white">{ico.positionCount}</span>
                     </div>
-                    <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {formatAddress(ico.id)}
-                      </span>
-                    </div>
                   </div>
+                  
+                  {ico.acceptedAssets && ico.acceptedAssets.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {ico.acceptedAssets.map((asset) => (
+                          <Image
+                            key={asset.id}
+                            src={getTokenPicture('sepolia', asset.address)}
+                            alt={asset.symbol}
+                            width={32}
+                            height={32}
+                            className="rounded-full border-2 border-white dark:border-gray-800"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </Link>
             ))}
