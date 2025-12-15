@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Navbar } from '@/components/Navbar';
 import { PurchaseModal } from '@/components/PurchaseModal';
 import { ICODivestModal } from '@/components/ICODivestModal';
 import { ICOUnlockModal } from '@/components/ICOUnlockModal';
@@ -108,7 +107,6 @@ export default function TokenDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
-        <Navbar />
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           <p className="mt-4 text-gray-600 dark:text-white">Loading ICO details...</p>
@@ -120,7 +118,6 @@ export default function TokenDetailPage() {
   if (!ico) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
-        <Navbar />
         <div className="text-center py-12">
           <p className="text-gray-600 dark:text-white">ICO not found</p>
           <Link href="/tokens" className="mt-4 inline-block text-primary hover:text-primary/70">
@@ -221,7 +218,6 @@ export default function TokenDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
-      <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/tokens" className="text-primary hover:text-primary/70 mb-4 inline-block">
           ← Back to ICOs

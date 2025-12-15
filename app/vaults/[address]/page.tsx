@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Navbar } from '@/components/Navbar';
 import { PositionCard } from '@/components/PositionCard';
 import { DepositModal } from '@/components/DepositModal';
 import { graphqlClient, GET_STAK_VAULT } from '@/lib/graphql';
@@ -83,7 +82,6 @@ export default function VaultDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
-        <Navbar />
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           <p className="mt-4 text-gray-600 dark:text-white">Loading vault details...</p>
@@ -95,7 +93,6 @@ export default function VaultDetailPage() {
   if (!vault) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
-        <Navbar />
         <div className="text-center py-12">
           <p className="text-gray-600 dark:text-white">Vault not found</p>
           <Link href="/vaults" className="mt-4 inline-block text-primary hover:text-primary/70">
@@ -203,7 +200,6 @@ export default function VaultDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
-      <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/vaults" className="text-primary hover:text-primary/70 mb-4 inline-block">
           ← Back to Vaults

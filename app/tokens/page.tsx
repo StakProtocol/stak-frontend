@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Navbar } from '@/components/Navbar';
 import { graphqlClient, GET_FLYING_ICOS } from '@/lib/graphql';
 import { getTokenPicture } from '@/app/utils/logos';
 import { EXCLUDED_ICO_ADDRESSES } from '@/app/utils/helper';
@@ -67,7 +66,6 @@ export default function TokensPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
-      <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white">

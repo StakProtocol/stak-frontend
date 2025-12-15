@@ -6,7 +6,6 @@ import { readContract, writeContract, waitForTransactionReceipt } from '@wagmi/c
 import { config } from '@/lib/wagmi';
 import { formatUnits, type Address } from 'viem';
 import FaucetABI from '@/app/abis/Faucet.json';
-import { Navbar } from '@/components/Navbar';
 import { getTokenPicture } from '@/app/utils/logos';
 import { chainByID } from '@/app/utils/chains';
 import Image from 'next/image';
@@ -224,7 +223,6 @@ export default function FaucetPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
-      <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
