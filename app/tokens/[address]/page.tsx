@@ -513,8 +513,8 @@ export default function TokenDetailPage() {
                   const assetSymbol = asset?.symbol || "UNKNOWN";
                   const picturePath = getTokenPicture("sepolia", position.asset);
                   
-                  const tokenAmount = formatNumber(position.tokenAmount, assetDecimals);
-                  const vestingAmount = formatNumber(position.vestingAmount, assetDecimals);
+                  const tokenAmount = formatNumber(position.tokenAmount, "18"); // ICO decimals: 18
+                  const vestingAmount = formatNumber(position.vestingAmount, "18"); // ICO decimals: 18
                   const assetAmount = formatNumber(position.assetAmount, assetDecimals);
                   
                   // Calculate vesting progress for this specific position
