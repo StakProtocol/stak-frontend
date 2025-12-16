@@ -116,7 +116,7 @@ export function ICODivestModal({
     <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50" onClick={onClose}>
       <div className="bg-white dark:bg-dark-primary rounded-xl p-6 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Divest Tokens</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Redeem Tokens</h2>
           <button
             onClick={onClose}
             disabled={isDivesting}
@@ -129,7 +129,7 @@ export function ICODivestModal({
         {/* Info */}
         <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-400">Max Divestible Tokens:</span>
+            <span className="text-gray-600 dark:text-gray-400">Max Redeemable Tokens:</span>
             <span className="font-medium text-gray-900 dark:text-white">{maxTokens.toFixed(2)}</span>
           </div>
         </div>
@@ -137,7 +137,7 @@ export function ICODivestModal({
         {/* Amount Input */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Tokens to Divest
+            Tokens to Redeem
           </label>
           <div className="flex gap-2">
             <input
@@ -172,7 +172,7 @@ export function ICODivestModal({
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 dark:border-blue-400"></div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                  {txStatus || 'Processing divest...'}
+                  {txStatus || 'Processing redeem...'}
                 </p>
                 {txHash && (
                   <div className="mt-1">
@@ -198,7 +198,7 @@ export function ICODivestModal({
             disabled={!isValidAmount() || isDivesting}
             className="flex-1 px-4 py-3 cursor-pointer bg-primary/60 hover:bg-primary/80 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
           >
-            {isDivesting ? 'Divesting...' : 'Divest'}
+            {isDivesting ? 'Redeeming...' : 'Redeem'}
           </button>
           <button
             onClick={onClose}

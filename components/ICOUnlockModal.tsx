@@ -116,7 +116,7 @@ export function ICOUnlockModal({
     <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50" onClick={onClose}>
       <div className="bg-white dark:bg-dark-primary rounded-xl p-6 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Unlock Tokens</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Claim Tokens</h2>
           <button
             onClick={onClose}
             disabled={isUnlocking}
@@ -137,7 +137,7 @@ export function ICOUnlockModal({
         {/* Amount Input */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Tokens to Unlock
+            Tokens to Claim
           </label>
           <div className="flex gap-2">
             <input
@@ -172,7 +172,7 @@ export function ICOUnlockModal({
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 dark:border-blue-400"></div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                  {txStatus || 'Processing unlock...'}
+                  {txStatus || 'Processing claim...'}
                 </p>
                 {txHash && (
                   <div className="mt-1">
@@ -198,7 +198,7 @@ export function ICOUnlockModal({
             disabled={!isValidAmount() || isUnlocking}
             className="flex-1 cursor-pointer px-4 py-3 bg-primary/60 hover:bg-primary/80 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
           >
-            {isUnlocking ? 'Unlocking...' : 'Unlock'}
+            {isUnlocking ? 'Claiming...' : 'Claim'}
           </button>
           <button
             onClick={onClose}

@@ -249,8 +249,8 @@ export default function TokenDetailPage() {
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(ico.totalSupply).toFixed(2)}</p>
             </div>
             <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Tokens Per USD</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(ico.tokensPerUsd, "0")}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Token Price</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">$ {(1/formatNumber(ico.tokensPerUsd, "0")).toFixed(2)}</p>
             </div>
             <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Positions</p>
@@ -461,7 +461,7 @@ export default function TokenDetailPage() {
           {/* Vesting Schedule Chart */}
           <div className="mb-8">
             <div className="mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Vesting Schedule</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Redemption Rights Expiration Schedule</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {ico && `${formatDate(ico.vestingStart)} - ${formatDate(ico.vestingEnd)}`}
               </p>
@@ -578,7 +578,7 @@ export default function TokenDetailPage() {
                             })}
                             className="px-3 py-1.5 bg-secondary/80 hover:bg-secondary/90 text-white rounded-lg text-sm font-medium cursor-pointer transition-colors"
                           >
-                            Divest
+                            Redeem
                           </button>
                           <button 
                             onClick={() => setUnlockModal({
@@ -590,7 +590,7 @@ export default function TokenDetailPage() {
                             })}
                             className="px-3 py-1.5 bg-[#2fc7a8]/80 hover:bg-[#2fc7a8]/90 text-white rounded-lg text-sm font-medium cursor-pointer transition-colors"
                           >
-                            Unlock
+                            Claim
                           </button>
                         </div>
                       </div>
@@ -602,14 +602,14 @@ export default function TokenDetailPage() {
                       {/* Main Stats Grid */}
                       <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
                         <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Asset Amount</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets</p>
                           <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                             {assetAmount.toFixed(2)}
                           </p>
                         </div>
                         
                         <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Token Amount</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Claimable Tokens</p>
                           <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                             {tokenAmount.toFixed(2)}
                           </p>
@@ -618,13 +618,13 @@ export default function TokenDetailPage() {
 
                       <div className="border-t border-gray-200 dark:border-gray-700 pt-4 grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
                         <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Divestible Tokens</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Reedemable Tokens</p>
                           <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                             {divestibleTokens.toFixed(2)}
                           </p>
                         </div>
                         <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Vested Tokens</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Non-Redeemable Tokens</p>
                           <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                             {vestedTokens.toFixed(2)}
                           </p>
@@ -636,7 +636,7 @@ export default function TokenDetailPage() {
                         {/* Vesting Progress Bar */}
                         <div className="mt-3">
                           <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                            <span>Vesting Progress</span>
+                            <span>Redemption Rights Expiration Progress</span>
                             <span>{((1 - positionVestingRate) * 100).toFixed(2)}%</span>
                           </div>
                           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">

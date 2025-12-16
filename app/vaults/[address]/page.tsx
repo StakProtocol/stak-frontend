@@ -221,26 +221,26 @@ export default function VaultDetailPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-6 gap-4 mb-8">
+          <div className="grid md:grid-cols-4 gap-4 mb-8">
             <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Assets</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalAssets.toFixed(2)}</p>
             </div>
-            <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
+            {/* <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Invested Assets</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{investedAssets.toFixed(2)}</p>
-            </div>
-            <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
+            </div> */}
+            {/* <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Utilization Rate</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{utilizationRate.toFixed(2)}%</p>
-            </div>
+            </div> */}
             <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Positions</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{vault.positionCount}</p>
             </div>
             <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Price Per Share</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{pricePerShare.toFixed(2)}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Share Price</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">$ {pricePerShare.toFixed(2)}</p>
             </div>
             <div className="bg-gray-50 dark:bg-dark-primary rounded-xl p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Supply</p>
@@ -360,7 +360,7 @@ export default function VaultDetailPage() {
           {/* Vesting Schedule Chart */}
           <div className="mb-8">
             <div className="mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Vesting Schedule</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Redemption Rights Expiration Schedule</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {formatDate(vault.vestingStart)} - {formatDate(vault.vestingEnd)}
               </p>
