@@ -1,19 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
-import { writeContract, waitForTransactionReceipt } from '@wagmi/core';
+import { readContract, writeContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config } from '@/lib/wagmi';
-import { parseUnits, isAddress } from 'viem';
+import { parseUnits, isAddress, erc20Abi, type Address } from 'viem';
 import toast from 'react-hot-toast';
-import FactoryStakVaultABI from '@/app/abis/FactoryStakVault.json';
+import VaultFactoryABI from '@/app/abis/VaultFactory.json';
 
 export default function NewVaultPage() {
   const router = useRouter();
   const { isConnected } = useAccount();
   const [loading, setLoading] = useState(false);
+  const [assetDecimals, setAssetDecimals] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     asset: '',
     name: '',
@@ -23,22 +24,65 @@ export default function NewVaultPage() {
     performanceRate: '',
     vestingStart: '',
     vestingEnd: '',
+    startingPrice: '',
+    divestFee: '',
   });
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  // Fetch asset decimals when asset address changes
+  useEffect(() => {
+    async function fetchDecimals() {
+      if (!formData.asset || !isAddress(formData.asset)) {
+        setAssetDecimals(null);
+        return;
+      }
+
+      try {
+        const decimals = await readContract(config, {
+          address: formData.asset as Address,
+          abi: erc20Abi,
+          functionName: 'decimals',
+          args: [],
+        });
+        setAssetDecimals(Number(decimals));
+      } catch (error) {
+        console.error('Error fetching decimals:', error);
+        setAssetDecimals(null);
+        toast.error('Failed to fetch token decimals. Please check the asset address.');
+      }
+    }
+
+    fetchDecimals();
+  }, [formData.asset]);
+
   const checkForm = () => {
-    const { asset, owner, treasury, performanceRate, vestingStart, vestingEnd } = formData;
+    const { asset, owner, treasury, performanceRate, vestingStart, vestingEnd, startingPrice, divestFee } = formData;
 
     if (!isAddress(asset) || !isAddress(owner) || !isAddress(treasury)) {
       toast.error('Please enter valid addresses');
       return false;
     }
 
+    if (assetDecimals === null) {
+      toast.error('Please wait for asset decimals to be fetched, or check the asset address');
+      return false;
+    }
+
     if (Number(performanceRate) < 0 || Number(performanceRate) > 50) {
       toast.error('Performance rate must be between 0 and 50');
+      return false;
+    }
+
+    if (Number(divestFee) < 0 || Number(divestFee) > 50) {
+      toast.error('Redemption fee must be between 0 and 50');
+      return false;
+    }
+
+    if (!startingPrice || Number(startingPrice) <= 0) {
+      toast.error('Starting price must be greater than 0');
       return false;
     }
 
@@ -60,7 +104,7 @@ export default function NewVaultPage() {
     setLoading(true);
     try {
       // Note: You'll need to set the factory contract address
-      const factoryAddress = process.env.NEXT_PUBLIC_FACTORY_STAK_VAULT_ADDRESS as `0x${string}`;
+      const factoryAddress = process.env.NEXT_PUBLIC_VAULT_FACTORY_ADDRESS as `0x${string}`;
 
       if (!factoryAddress) {
         toast.error('Factory contract address not configured');
@@ -73,9 +117,15 @@ export default function NewVaultPage() {
         return;
       }
 
+      if (assetDecimals === null) {
+        toast.error('Asset decimals not available. Please check the asset address.');
+        setLoading(false);
+        return;
+      }
+
       const hash = await writeContract(config, {
         address: factoryAddress,
-        abi: FactoryStakVaultABI,
+        abi: VaultFactoryABI,
         functionName: 'createStakVault',
         args: [
           formData.asset as `0x${string}`,
@@ -86,6 +136,8 @@ export default function NewVaultPage() {
           parseUnits(formData.performanceRate, 2),
           BigInt(Math.floor(new Date(formData.vestingStart).getTime() / 1000)),
           BigInt(Math.floor(new Date(formData.vestingEnd).getTime() / 1000)),
+          parseUnits(formData.startingPrice, assetDecimals),
+          parseUnits(formData.divestFee, 2),
         ],
       });
 
@@ -199,19 +251,61 @@ export default function NewVaultPage() {
               </div>
             </div>
 
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Performance Rate
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.performanceRate}
+                  onChange={(e) => handleInputChange('performanceRate', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="10"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Performance fee rate (e.g., 10 for 10%)</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Redemption Fee
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.divestFee}
+                  onChange={(e) => handleInputChange('divestFee', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="5"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Redemption fee rate (e.g., 5 for 5%)</p>
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Performance Rate
+                Starting Price
+                {assetDecimals !== null && (
+                  <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                    (Decimals: {assetDecimals})
+                  </span>
+                )}
               </label>
               <input
                 type="text"
                 required
-                value={formData.performanceRate}
-                onChange={(e) => handleInputChange('performanceRate', e.target.value)}
+                value={formData.startingPrice}
+                onChange={(e) => handleInputChange('startingPrice', e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                placeholder="10"
+                placeholder="1.0"
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Performance fee rate (e.g., 10 for 10%)</p>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Initial price per share. Will be parsed with {assetDecimals !== null ? assetDecimals : 'asset'} decimals.
+                {assetDecimals === null && formData.asset && isAddress(formData.asset) && (
+                  <span className="text-yellow-600 dark:text-yellow-400"> Fetching decimals...</span>
+                )}
+              </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">

@@ -25,13 +25,7 @@ pnpm install
 
 ### Environment Variables
 
-Create a `.env.local` file in the root directory:
-
-```env
-NEXT_PUBLIC_FACTORY_STAK_VAULT_ADDRESS=0x...
-NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your-project-id
-NEXT_PUBLIC_SEPOLIA_RPC=https://eth-sepolia.g.alchemy.com/v2/xIr38p6GdYSjklWQISOO45i19CREhjna
-```
+Create an `.env` file in the root directory by copying it from `.env.example`
 
 **Note:** The application is configured to run on **Sepolia Testnet** (Chain ID: 11155111). Make sure your wallet is connected to Sepolia testnet when using the application.
 
