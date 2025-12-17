@@ -25,9 +25,10 @@ interface PositionCardProps {
     vestingRate: number;
     pricePerShare: number;
     assetSymbol: string;
+    vaultDivestFee: number;
 }
 
-export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRate, pricePerShare, assetSymbol }: PositionCardProps) {
+export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRate, pricePerShare, assetSymbol, vaultDivestFee }: PositionCardProps) {
     const [isDivestModalOpen, setIsDivestModalOpen] = useState(false);
     const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
     
@@ -39,6 +40,7 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
     // Calculate profit/loss
     const initialAssets = formatNumber(position.initialAssets, vaultDecimals);
     const assetsDivested = formatNumber(position.assetsDivested, vaultDecimals);
+    const assetsDivestedAfterFee = assetsDivested * (1-vaultDivestFee);
     const initialValue = initialAssets - assetsDivested;
 
     const sharesUnlocked = formatNumber(position.sharesUnlocked, vaultDecimals);
@@ -112,7 +114,7 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets Redeemed</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                        {formatNumber(position.assetsDivested, vaultDecimals).toFixed(2)}
+                        {assetsDivestedAfterFee.toFixed(2)}
                     </p>
                 </div>
 

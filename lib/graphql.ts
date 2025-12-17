@@ -47,6 +47,7 @@ export const GET_STAK_VAULT = `
       redeemableAssets
       totalShares
       totalSupply
+      divestFee
       positionCount
       createdAt
       updatedAt

@@ -42,6 +42,7 @@ interface StakVault {
   redeemableAssets: string;
   totalSupply: string;
   totalShares: string;
+  divestFee: string;
   positionCount: string;
   positions: StakPosition[];
 }
@@ -109,6 +110,8 @@ export default function VaultDetailPage() {
   const totalShares = formatNumber(vault.totalShares, vault.decimals);
   const totalSupply = formatNumber(vault.totalSupply, vault.decimals);
   const pricePerShare = totalSupply > 0 ? totalAssets / totalSupply : 1.00;
+  const divestFee = formatNumber(vault.divestFee, "4");
+
 
   let vestingRate = (parseInt(vault.vestingEnd) - (new Date().getTime() / 1000)) / (parseInt(vault.vestingEnd) - parseInt(vault.vestingStart));
   vestingRate = Math.max(0, Math.min(1, vestingRate));
@@ -469,6 +472,7 @@ export default function VaultDetailPage() {
                     vestingRate={vestingRate}
                     pricePerShare={pricePerShare}
                     assetSymbol={vault.symbol}
+                    vaultDivestFee={divestFee}
                   />
                 ))}
               </div>
