@@ -44,6 +44,7 @@ export const GET_STAK_VAULT = `
       totalPerformanceFees
       totalAssets
       investedAssets
+      redeemableAssets
       totalShares
       totalSupply
       positionCount

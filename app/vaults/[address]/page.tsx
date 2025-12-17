@@ -39,6 +39,7 @@ interface StakVault {
   totalPerformanceFees: string;
   totalAssets: string;
   investedAssets: string;
+  redeemableAssets: string;
   totalShares: string;
   totalSupply: string;
   positionCount: string;
@@ -116,9 +117,11 @@ export default function VaultDetailPage() {
   const sharesVested = totalShares * (1 - vestingRate);
   const sharesLocked = totalShares - sharesUnlocked - sharesVested;
 
-  const vestedPercentage = sharesVested / totalShares;
-  let redeemableAssets = totalAssets; // formatNumber(vault.redeemableAssets, vault.decimals)
-  redeemableAssets = redeemableAssets * (1-vestedPercentage);
+  console.log("REDEEMABLE ASSETS", vault.redeemableAssets);
+  console.log("VESTING RATE", vestingRate);
+
+  let redeemableAssets = formatNumber(vault.redeemableAssets, vault.decimals)
+  redeemableAssets = redeemableAssets * vestingRate;
   const vestedAssets = totalAssets - redeemableAssets;
 
   const liabilitiesData = [
@@ -258,7 +261,7 @@ export default function VaultDetailPage() {
           </div>
 
           {/* Pie Charts */}
-          <div className="mb-8">
+          <div className="mb-8 mt-20">
             <div className="grid md:grid-cols-3 lg:grid-cols-3 gap-8">
               {/* Asset Distribution Chart */}
               <div>
@@ -413,7 +416,7 @@ export default function VaultDetailPage() {
           </div>
 
           {/* Vesting Schedule Chart */}
-          <div className="mb-8">
+          <div className="mb-8 mt-20">
             <div className="mb-4">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Redemption Rights Expiration Schedule</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
