@@ -197,9 +197,13 @@ export function DivestModal({
           <div className="mb-6 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
             <div className="flex justify-between text-sm mb-1">
               <span className="text-gray-600 dark:text-gray-400">You will receive:</span>
-              <span className="font-semibold text-green-700 dark:text-green-400">
-                {amountAfterFee.toFixed(6)} <img src={assetPicture} alt="Asset" className="w-4 h-4 inline-block" />
-              </span>
+              <div className='flex'>
+                <span className="my-auto font-semibold text-green-700 dark:text-green-400">
+                  {amountAfterFee.toFixed(6)}
+                </span>
+                <img src={assetPicture} alt="Asset" className="w-4 h-4 my-auto ml-1" />
+              </div>
+              
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               After {divestFeePercentage}% redemption fee deduction
