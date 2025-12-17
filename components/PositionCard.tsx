@@ -51,6 +51,8 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
     const profitLossPercentage = initialValue > 0 ? ((profitLoss / initialValue) * 100).toFixed(2) : "0.00";
     const isProfit = profitLoss > -0.00000001;
 
+    const redeemableValue = formatNumber(position.assetAmount, vaultDecimals) * (1-vaultDivestFee);
+
     return (
         <>
         <div className="bg-white dark:bg-dark-primary rounded-xl p-6 transition-all duration-200">
@@ -81,25 +83,12 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
             </div>
 
             {/* Main Stats Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 mb-4">
-                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                    <p className={`text-xs mb-1 font-bold ${isProfit ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>P&L</p>
-                    <div className="flex items-center gap-1">
-                        <p className={`text-lg font-semibold ${isProfit ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                            {isProfit ? '+' : ''}{profitLoss.toFixed(2)}
-                        </p>
-                        <span className={`text-xs px-1.5 py-0.5 rounded ${isProfit ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
-                            {isProfit ? '+' : ''}{profitLossPercentage}%
-                        </span>
-                    </div>
-                </div>
-            </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Redeemable Shares</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                        {formatNumber(position.assetAmount, vaultDecimals).toFixed(2)}
+                        {divestibleShares.toFixed(2)}
                     </p>
                 </div>
                 
@@ -113,6 +102,28 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
 
             <div className="border-t border-gray-700 pt-4 grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Redeemable Value</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                        {redeemableValue.toFixed(2)}
+                    </p>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+                    <p className={`text-xs mb-1 font-bold ${isProfit ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>P&L</p>
+                    <div className="flex items-center gap-1">
+                        <p className={`text-lg font-semibold ${isProfit ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                            {isProfit ? '+' : ''}{profitLoss.toFixed(2)}
+                        </p>
+                        <span className={`text-xs px-1.5 py-0.5 rounded ${isProfit ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                            {isProfit ? '+' : ''}{profitLossPercentage}%
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {/* <div className="border-t border-gray-700 pt-4 grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
+                
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets Redeemed</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                         {assetsDivestedAfterFee.toFixed(2)}
@@ -125,15 +136,6 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
                         {formatNumber(position.sharesUnlocked, vaultDecimals).toFixed(2)}
                     </p>
                 </div>
-            </div>
-
-            <div className="border-t border-gray-700 pt-4 grid grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
-                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Redeemable Shares</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                        {divestibleShares.toFixed(2)}
-                    </p>
-                </div>
 
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Non-Redeemable Shares</p>
@@ -141,10 +143,11 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
                         {vestedShares}
                     </p>
                 </div>
-            </div>
+
+            </div> */}
 
             {/* Vesting Information */}
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+            <div className="">
                 {/* Vesting Progress Bar */}
                 <div className="mt-3">
                     <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
