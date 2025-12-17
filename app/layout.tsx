@@ -18,7 +18,7 @@ const manrope = Manrope({
 
 const common = {
   title: "Stak Protocol - Launch Your DeFi Products",
-  description: "Launch and manage Flying ICOs and Stak Vaults",
+  description: "Launch and manage Stak Vaults",
   image: '/images/logo-wordmark-white.png'
 }
 

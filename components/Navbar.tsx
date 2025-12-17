@@ -28,7 +28,6 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigation = [
-    // { name: 'Flying ICOs', href: '/tokens' },
     { name: 'Stak Vaults', href: '/vaults' },
     { name: 'Faucet', href: '/faucet' },
   ];

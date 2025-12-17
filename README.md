@@ -1,11 +1,10 @@
 # Stak Protocol Frontend
 
-A modern web3 application for launching and managing Flying ICOs and Stak Vaults.
+A modern web3 application for launching and managing Stak Vaults.
 
 ## Features
 
 - **Wallet Connection**: Connect using MetaMask, WalletConnect, or injected wallets
-- **Flying ICOs**: Launch and manage token offerings with perpetual put options
 - **Stak Vaults**: Create and manage yield-generating vaults with performance fees
 - **Data Visualization**: Interactive charts showing token distribution, vesting schedules, and utilization rates
 - **Position Management**: View and manage your positions in ICOs and vaults
@@ -29,7 +28,6 @@ pnpm install
 Create a `.env.local` file in the root directory:
 
 ```env
-NEXT_PUBLIC_FACTORY_FLYING_ICO_ADDRESS=0x...
 NEXT_PUBLIC_FACTORY_STAK_VAULT_ADDRESS=0x...
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your-project-id
 NEXT_PUBLIC_SEPOLIA_RPC=https://eth-sepolia.g.alchemy.com/v2/xIr38p6GdYSjklWQISOO45i19CREhjna
@@ -48,9 +46,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Project Structure
 
 - `/app` - Next.js app router pages and layouts
-  - `/tokens` - Flying ICO list page
-  - `/tokens/[address]` - Flying ICO detail page with charts
-  - `/tokens/new` - Create new Flying ICO form
   - `/vaults` - Stak Vault list page
   - `/vaults/[address]` - Stak Vault detail page with charts
   - `/vaults/new` - Create new Stak Vault form
