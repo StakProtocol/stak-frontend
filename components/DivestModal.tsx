@@ -8,6 +8,7 @@ import { parseUnits, formatUnits, type Address } from 'viem';
 import StakVaultABI from '@/app/abis/StakVault.json';
 import { formatNumber } from '@/app/utils/helper';
 import { chainByID } from '@/app/utils/chains';
+import { getTokenPicture } from '@/app/utils/logos';
 import toast from 'react-hot-toast';
 
 interface DivestModalProps {
@@ -17,7 +18,9 @@ interface DivestModalProps {
   positionId: string;
   maxShares: number; // divestible shares
   vaultDecimals: string;
-  assetSymbol: string;
+  assetAddress: Address;
+  divestFee: number; // redemption fee as a decimal (e.g., 0.01 for 1%)
+  pricePerShare: number; // price per share
 }
 
 export function DivestModal({
@@ -27,7 +30,9 @@ export function DivestModal({
   positionId,
   maxShares,
   vaultDecimals,
-  assetSymbol,
+  assetAddress,
+  divestFee,
+  pricePerShare
 }: DivestModalProps) {
   const { address: userAddress, isConnected } = useAccount();
   const chainId = useChainId();
@@ -110,6 +115,24 @@ export function DivestModal({
     }
   };
 
+  // Calculate the amount user will receive after fees
+  const calculateAmountAfterFee = () => {
+    if (!sharesAmount || !isValidAmount()) return 0;
+    try {
+      const shares = parseFloat(sharesAmount);
+      const assetValue = shares * pricePerShare;
+      const amountAfterFee = assetValue * (1 - divestFee);
+      return amountAfterFee;
+    } catch {
+      return 0;
+    }
+  };
+
+  const amountAfterFee = calculateAmountAfterFee();
+  const divestFeePercentage = (divestFee * 100).toFixed(2);
+
+  const assetPicture = getTokenPicture("sepolia".toString(), assetAddress.toString());
+
   if (!isOpen) return null;
 
   return (
@@ -128,9 +151,13 @@ export function DivestModal({
 
         {/* Info */}
         <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-sm mb-2">
             <span className="text-gray-600 dark:text-gray-400">Max Redeemable Shares:</span>
             <span className="font-medium text-gray-900 dark:text-white">{maxShares.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-600 dark:text-gray-400">Redemption Fee:</span>
+            <span className="font-medium text-red-600 dark:text-red-400">{divestFeePercentage}%</span>
           </div>
         </div>
 
@@ -164,6 +191,21 @@ export function DivestModal({
             </p>
           )}
         </div>
+
+        {/* Amount After Fee */}
+        {sharesAmount && isValidAmount() && (
+          <div className="mb-6 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-gray-600 dark:text-gray-400">You will receive:</span>
+              <span className="font-semibold text-green-700 dark:text-green-400">
+                {amountAfterFee.toFixed(6)} <img src={assetPicture} alt="Asset" className="w-4 h-4 inline-block" />
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              After {divestFeePercentage}% redemption fee deduction
+            </p>
+          </div>
+        )}
 
         {/* Transaction Status */}
         {(isDivesting || txStatus) && (

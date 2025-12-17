@@ -24,11 +24,12 @@ interface PositionCardProps {
     vaultDecimals: string;
     vestingRate: number;
     pricePerShare: number;
-    assetSymbol: string;
+    assetAddress: Address;
+    vaultSymbol: string;
     vaultDivestFee: number;
 }
 
-export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRate, pricePerShare, assetSymbol, vaultDivestFee }: PositionCardProps) {
+export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRate, pricePerShare, assetAddress, vaultSymbol, vaultDivestFee }: PositionCardProps) {
     const [isDivestModalOpen, setIsDivestModalOpen] = useState(false);
     const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
     
@@ -169,7 +170,9 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
             positionId={position.positionId}
             maxShares={divestibleShares}
             vaultDecimals={vaultDecimals}
-            assetSymbol={assetSymbol}
+            assetAddress={assetAddress}
+            divestFee={vaultDivestFee}
+            pricePerShare={pricePerShare}
         />
         <UnlockModal
             isOpen={isUnlockModalOpen}
@@ -178,7 +181,7 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
             positionId={position.positionId}
             maxShares={positionShare}
             vaultDecimals={vaultDecimals}
-            assetSymbol={assetSymbol}
+            vaultSymbol={vaultSymbol}
         />
         </>
     );

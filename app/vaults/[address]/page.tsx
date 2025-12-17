@@ -471,7 +471,8 @@ export default function VaultDetailPage() {
                     vaultDecimals={vault.decimals}
                     vestingRate={vestingRate}
                     pricePerShare={pricePerShare}
-                    assetSymbol={vault.symbol}
+                    assetAddress={vault.asset as `0x${string}`}
+                    vaultSymbol={vault.symbol}
                     vaultDivestFee={divestFee}
                   />
                 ))}

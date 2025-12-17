@@ -17,7 +17,7 @@ interface UnlockModalProps {
   positionId: string;
   maxShares: number; // total position shares
   vaultDecimals: string;
-  assetSymbol: string;
+  vaultSymbol: string;
 }
 
 export function UnlockModal({
@@ -27,7 +27,7 @@ export function UnlockModal({
   positionId,
   maxShares,
   vaultDecimals,
-  assetSymbol,
+  vaultSymbol,
 }: UnlockModalProps) {
   const { address: userAddress, isConnected } = useAccount();
   const chainId = useChainId();
