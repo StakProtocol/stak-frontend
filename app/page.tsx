@@ -9,16 +9,17 @@ export default function Home() {
             Launch Your DeFi Products
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-2">
-            Create and manage Flying ICOs and Stak Vaults with ease.
+            {/* Create and manage Flying ICOs and Stak Vaults with ease. */}
+            Create and manage Stak Vaults with ease.
           </p>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-4">
             Build the future of decentralized finance.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-1 gap-8 max-w-xl mx-auto">
           {/* Flying ICO Panel */}
-          <Link href="/tokens">
+          {/* <Link href="/tokens">
             <div className="group relative bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-secondary">
               <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 to-secondary/30 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative">
@@ -42,7 +43,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </Link>
+          </Link> */}
 
           {/* Stak Vault Panel */}
           <Link href="/vaults">
