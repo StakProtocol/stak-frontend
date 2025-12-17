@@ -108,53 +108,62 @@ export default function VaultDetailPage() {
   const totalShares = formatNumber(vault.totalShares, vault.decimals);
   const totalSupply = formatNumber(vault.totalSupply, vault.decimals);
   const pricePerShare = totalSupply > 0 ? totalAssets / totalSupply : 1.00;
-  // Calculate utilization rate
-  const utilizationRate = totalAssets > 0 ? (investedAssets / totalAssets) * 100 : 0;
 
   let vestingRate = (parseInt(vault.vestingEnd) - (new Date().getTime() / 1000)) / (parseInt(vault.vestingEnd) - parseInt(vault.vestingStart));
   vestingRate = Math.max(0, Math.min(1, vestingRate));
 
-  // Pie chart data
-  const pieData = vault ? [
+  const sharesUnlocked = totalSupply - totalShares;
+  const sharesVested = totalShares * (1 - vestingRate);
+  const sharesLocked = totalShares - sharesUnlocked - sharesVested;
+
+  const vestedPercentage = sharesVested / totalShares;
+  let redeemableAssets = totalAssets; // formatNumber(vault.redeemableAssets, vault.decimals)
+  redeemableAssets = redeemableAssets * (1-vestedPercentage);
+  const vestedAssets = totalAssets - redeemableAssets;
+
+  const liabilitiesData = [
     {
-      name: 'Assets in Vault',
+      name: 'Redeemable Assets',
+      value: redeemableAssets,
+    },
+    {
+      name: 'Vested Assets',
+      value: vestedAssets,
+    },
+  ];
+
+  // Shares distribution data
+  const sharesData = [
+    {
+      name: 'Redeemable Shares',
+      value: sharesLocked,
+    },
+    {
+      name: 'Vested Shares',
+      value: sharesUnlocked + sharesVested,
+    },
+  ];
+  
+
+  // Strategy distribution data
+  const liquidatableStrategy = investedAssets * 0.7;
+  const riskStrategy = investedAssets * 0.3;
+
+  // Pie chart data
+  const pieData = [
+    {
+      name: 'Cash',
       value: formatNumber(vault.totalAssets, vault.decimals),
     },
     {
-      name: 'Invested Assets',
-      value: formatNumber(vault.investedAssets, vault.decimals),
+      name: 'Redeemable Vault',
+      value: liquidatableStrategy,
     },
     {
-      name: 'Performance Fees',
-      value: formatNumber(vault.totalPerformanceFees, vault.decimals),
+      name: 'Vested Vault',
+      value: riskStrategy,
     },
-  ] : [];
-
-  // Shares distribution data
-  const sharesData = vault ? (() => {
-    // Calculate shares held by vault (locked shares in positions)
-    const totalShares = formatNumber(vault.totalShares, vault.decimals);
-    const sharesUnlocked = totalSupply - totalShares;
-    const sharesVested = totalShares * (1 - vestingRate);
-    const sharesLocked = totalShares - sharesUnlocked - sharesVested;
-    // Shares not held by vault (unlocked/released shares)
-    
-
-    return [
-      {
-        name: 'Shares in Vault',
-        value: sharesLocked,
-      },
-      {
-        name: 'Shares Unlocked',
-        value: sharesUnlocked,
-      },
-      {
-        name: 'Shares Vested',
-        value: sharesVested,
-      },
-    ];
-  })() : [];
+  ];
 
   // Vesting schedule data
   const vestingData = (() => {
@@ -250,13 +259,13 @@ export default function VaultDetailPage() {
 
           {/* Pie Charts */}
           <div className="mb-8">
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-3 lg:grid-cols-3 gap-8">
               {/* Asset Distribution Chart */}
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Asset Distribution</h2>
-                <div className="flex items-center h-64 gap-2">
+                <div className="flex flex-col items-center">
                   {/* Pie Chart */}
-                  <div className="h-full shrink-0" style={{ width: '256px' }}>
+                  <div className="w-full" style={{ height: '200px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
@@ -265,7 +274,7 @@ export default function VaultDetailPage() {
                           cy="50%"
                           labelLine={false}
                           label={false}
-                          outerRadius={80}
+                          outerRadius={70}
                           fill="#135b66"
                           dataKey="value"
                         >
@@ -277,25 +286,23 @@ export default function VaultDetailPage() {
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
-                  {/* Custom Legend on the right */}
-                  <div className="flex flex-col gap-3 shrink-0">
+                  {/* Custom Legend below */}
+                  <div className="flex flex-col gap-3 mt-4">
                     {pieData.map((entry, index) => {
                       const total = pieData.reduce((sum, item) => sum + item.value, 0);
                       const percent = total > 0 ? (entry.value / total) * 100 : 0;
                       return (
-                        <div key={`legend-${index}`} className="flex items-center gap-3">
+                        <div key={`legend-${index}`} className="flex items-center gap-2">
                           <div
                             className="w-4 h-4 rounded shrink-0"
                             style={{ backgroundColor: COLORS[index % COLORS.length] }}
                           />
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {entry.name}
-                            </span>
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                              {percent.toFixed(1)}%
-                            </span>
-                          </div>
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {entry.name}
+                          </span>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {percent.toFixed(1)}%
+                          </span>
                         </div>
                       );
                     })}
@@ -306,9 +313,9 @@ export default function VaultDetailPage() {
               {/* Shares Distribution Chart */}
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Shares Distribution</h2>
-                <div className="flex items-center h-64 gap-2">
+                <div className="flex flex-col items-center">
                   {/* Pie Chart */}
-                  <div className="h-full shrink-0" style={{ width: '256px' }}>
+                  <div className="w-full" style={{ height: '200px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
@@ -317,7 +324,7 @@ export default function VaultDetailPage() {
                           cy="50%"
                           labelLine={false}
                           label={false}
-                          outerRadius={80}
+                          outerRadius={70}
                           fill="#135b66"
                           dataKey="value"
                         >
@@ -329,25 +336,73 @@ export default function VaultDetailPage() {
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
-                  {/* Custom Legend on the right */}
-                  <div className="flex flex-col gap-3 shrink-0">
+                  {/* Custom Legend below */}
+                  <div className="flex flex-col gap-3 mt-4">
                     {sharesData.map((entry, index) => {
                       const total = sharesData.reduce((sum, item) => sum + item.value, 0);
                       const percent = total > 0 ? (entry.value / total) * 100 : 0;
                       return (
-                        <div key={`legend-shares-${index}`} className="flex items-center gap-3">
+                        <div key={`legend-shares-${index}`} className="flex items-center gap-2">
                           <div
                             className="w-4 h-4 rounded shrink-0"
                             style={{ backgroundColor: COLORS[index % COLORS.length] }}
                           />
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {entry.name}
-                            </span>
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                              {percent.toFixed(1)}%
-                            </span>
-                          </div>
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {entry.name}
+                          </span>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {percent.toFixed(1)}%
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Liabilities Chart */}
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Liabilities</h2>
+                <div className="flex flex-col items-center">
+                  {/* Pie Chart */}
+                  <div className="w-full" style={{ height: '200px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={liabilitiesData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={false}
+                          outerRadius={70}
+                          fill="#135b66"
+                          dataKey="value"
+                        >
+                          {liabilitiesData.map((_, index) => (
+                            <Cell key={`cell-liabilities-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value: number) => value.toFixed(2)} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  {/* Custom Legend below */}
+                  <div className="flex flex-col gap-3 mt-4">
+                    {liabilitiesData.map((entry, index) => {
+                      const total = liabilitiesData.reduce((sum, item) => sum + item.value, 0);
+                      const percent = total > 0 ? (entry.value / total) * 100 : 0;
+                      return (
+                        <div key={`legend-liabilities-${index}`} className="flex items-center gap-2">
+                          <div
+                            className="w-4 h-4 rounded shrink-0"
+                            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                          />
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {entry.name}
+                          </span>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {percent.toFixed(1)}%
+                          </span>
                         </div>
                       );
                     })}

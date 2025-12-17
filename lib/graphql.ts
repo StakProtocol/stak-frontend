@@ -88,6 +88,7 @@ export const GET_STAK_VAULTS = `
       symbol
       decimals
       totalAssets
+      totalSupply
       investedAssets
       totalPerformanceFees
       redeemsAtNavEnabled

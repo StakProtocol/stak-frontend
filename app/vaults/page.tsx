@@ -14,6 +14,7 @@ interface StakVault {
   symbol: string;
   decimals: string;
   totalAssets: string;
+  totalSupply: string;
   investedAssets: string;
   redeemsAtNavEnabled: boolean;
   totalPerformanceFees: string;
@@ -69,7 +70,7 @@ export default function VaultsPage() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {vaults.map((vault) => {
-              const total = formatNumber(vault.totalAssets, vault.decimals) + formatNumber(vault.investedAssets, vault.decimals) - formatNumber(vault.totalPerformanceFees, vault.decimals);
+              const total = formatNumber(vault.totalAssets, vault.decimals) + formatNumber(vault.investedAssets, vault.decimals);
               return (
                 <Link key={vault.id} href={`/vaults/${vault.id}`}>
                   <div className="bg-white dark:bg-dark-primary rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all border-2 border-gray-200 dark:border-gray-700 hover:border-primary">
@@ -95,8 +96,8 @@ export default function VaultsPage() {
                         <span className="font-semibold text-gray-900 dark:text-white">{total}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-300">Invested:</span>
-                        <span className="font-semibold text-gray-900 dark:text-white">{formatNumber(vault.investedAssets, vault.decimals)}</span>
+                        <span className="text-gray-600 dark:text-gray-300">Total Supply:</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">{formatNumber(vault.totalSupply, vault.decimals)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-300">Positions:</span>
