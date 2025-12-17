@@ -40,8 +40,8 @@ interface StakVault {
   totalAssets: string;
   investedAssets: string;
   redeemableAssets: string;
-  totalShares: string;
   totalSupply: string;
+  totalShares: string;
   positionCount: string;
   positions: StakPosition[];
 }
@@ -113,12 +113,21 @@ export default function VaultDetailPage() {
   let vestingRate = (parseInt(vault.vestingEnd) - (new Date().getTime() / 1000)) / (parseInt(vault.vestingEnd) - parseInt(vault.vestingStart));
   vestingRate = Math.max(0, Math.min(1, vestingRate));
 
-  const sharesUnlocked = totalSupply - totalShares;
-  const sharesVested = totalShares * (1 - vestingRate);
-  const sharesLocked = totalShares - sharesUnlocked - sharesVested;
+  const redeemableShares = totalShares * vestingRate;
+  // claimedShares = totalSupply - totalShares; // as reference
+  const vestedShares = totalSupply - redeemableShares;
 
-  console.log("REDEEMABLE ASSETS", vault.redeemableAssets);
-  console.log("VESTING RATE", vestingRate);
+  // Shares distribution data
+  const sharesData = [
+    {
+      name: 'Redeemable Shares',
+      value: redeemableShares,
+    },
+    {
+      name: 'Vested Shares',
+      value: vestedShares,
+    },
+  ];
 
   let redeemableAssets = formatNumber(vault.redeemableAssets, vault.decimals)
   redeemableAssets = redeemableAssets * vestingRate;
@@ -133,20 +142,7 @@ export default function VaultDetailPage() {
       name: 'Vested Assets',
       value: vestedAssets,
     },
-  ];
-
-  // Shares distribution data
-  const sharesData = [
-    {
-      name: 'Redeemable Shares',
-      value: sharesLocked,
-    },
-    {
-      name: 'Vested Shares',
-      value: sharesUnlocked + sharesVested,
-    },
-  ];
-  
+  ];  
 
   // Strategy distribution data
   const liquidatableStrategy = investedAssets * 0.7;
@@ -199,8 +195,8 @@ export default function VaultDetailPage() {
         vestingRate = (end - time) / (end - start);
       }
 
-      // Calculate vested shares: totalShares * (1 - vestingRate)
-      const vestedShares = totalShares * (1 - vestingRate);
+      // Calculate vested shares: totalSupply * (1 - vestingRate)
+      const vestedShares = totalSupply * (1 - vestingRate);
 
       return {
         time: new Date(time * 1000).toLocaleDateString(),
