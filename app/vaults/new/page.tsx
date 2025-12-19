@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAccount } from 'wagmi';
+import { useActiveAccount } from "thirdweb/react";
 import { readContract, writeContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config } from '@/lib/wagmi';
 import { parseUnits, isAddress, erc20Abi, type Address } from 'viem';
@@ -12,7 +12,7 @@ import VaultFactoryABI from '@/app/abis/VaultFactory.json';
 
 export default function NewVaultPage() {
   const router = useRouter();
-  const { isConnected } = useAccount();
+  const activeAccount = useActiveAccount();
   const [loading, setLoading] = useState(false);
   const [assetDecimals, setAssetDecimals] = useState<number | null>(null);
   const [formData, setFormData] = useState({
@@ -27,9 +27,44 @@ export default function NewVaultPage() {
     startingPrice: '',
     divestFee: '',
   });
+  const [treasurySameAsOwner, setTreasurySameAsOwner] = useState(false);
+  const [useConnectedWallet, setUseConnectedWallet] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
+    // Don't allow manual changes to owner if using connected wallet
+    if (field === 'owner' && useConnectedWallet) {
+      return;
+    }
+
     setFormData(prev => ({ ...prev, [field]: value }));
+
+    // If owner changes and treasury is set to same as owner, update treasury
+    if (field === 'owner' && treasurySameAsOwner) {
+      setFormData(prev => ({ ...prev, treasury: value }));
+    }
+  };
+
+  const handleUseConnectedWallet = (checked: boolean) => {
+    setUseConnectedWallet(checked);
+    if (checked) {
+      if (activeAccount?.address) {
+        setFormData(prev => ({
+          ...prev,
+          owner: activeAccount.address,
+          treasury: treasurySameAsOwner ? activeAccount.address : prev.treasury
+        }));
+      } else {
+        toast.error('Please connect your wallet first');
+        setUseConnectedWallet(false);
+      }
+    }
+  };
+
+  const handleTreasurySameAsOwner = (checked: boolean) => {
+    setTreasurySameAsOwner(checked);
+    if (checked && formData.owner) {
+      setFormData(prev => ({ ...prev, treasury: formData.owner }));
+    }
   };
 
   // Fetch asset decimals when asset address changes
@@ -61,9 +96,16 @@ export default function NewVaultPage() {
   const checkForm = () => {
     const { asset, owner, treasury, performanceRate, vestingStart, vestingEnd, startingPrice, divestFee } = formData;
 
-    if (!isAddress(asset) || !isAddress(owner) || !isAddress(treasury)) {
-      toast.error('Please enter valid addresses');
-      return false;
+    if (!isAddress(asset)) {
+      toast.error(`Invalid address format for accepted asset: ${asset}`);
+    }
+
+    if (!isAddress(owner)) {
+      toast.error(`Invalid address format for accepted owner: ${owner}`);
+    }
+
+    if (!isAddress(treasury)) {
+      toast.error(`Invalid address format for accepted treasury: ${treasury}`);
     }
 
     if (assetDecimals === null) {
@@ -86,8 +128,28 @@ export default function NewVaultPage() {
       return false;
     }
 
-    if (new Date(vestingStart) >= new Date(vestingEnd)) {
-      toast.error('Vesting start must be before vesting end');
+    if (!vestingStart) {
+      toast.error('Vesting start date is required');
+      return false;
+    }
+
+    if (!vestingEnd) {
+      toast.error('Vesting end date is required');
+      return false;
+    }
+
+    // Check vesting dates
+    const startDate = new Date(vestingStart);
+    const endDate = new Date(vestingEnd);
+    const now = new Date();
+
+    if (startDate <= now) {
+      toast.error('Vesting start must be in the future');
+      return false;
+    }
+
+    if (endDate <= startDate) {
+      toast.error('Vesting end must be after vesting start');
       return false;
     }
 
@@ -96,7 +158,7 @@ export default function NewVaultPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isConnected) {
+    if (!activeAccount?.address) {
       toast.error('Please connect your wallet');
       return;
     }
@@ -145,23 +207,11 @@ export default function NewVaultPage() {
       router.push('/vaults');
     } catch (error) {
       console.error('Error creating vault:', error);
-      alert('Failed to create vault. Please check the console for details.');
+      toast.error('Failed to create vault. Please check the console for details.');
     } finally {
       setLoading(false);
     }
   };
-
-  if (!isConnected) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center py-12 bg-white dark:bg-dark-primary rounded-2xl shadow-lg">
-            <p className="text-gray-600 font-medium dark:text-gray-200 my-2">Please connect your wallet to create a new vault</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-primary dark:to-black">
@@ -189,34 +239,36 @@ export default function NewVaultPage() {
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">ERC-20 token that will be staked in the vault (e.g. USDC, WETH).</p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Name
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                placeholder="My Vault"
-              />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Human-readable name for the vault. This will also be the ERC-20 name of the vault token.</p>
-            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="My Vault"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Human-readable name for the vault. This will also be the ERC-20 name of the vault token.</p>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Symbol
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.symbol}
-                onChange={(e) => handleInputChange('symbol', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                placeholder="MVLT"
-              />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Short ticker symbol for the vault token (e.g. vUSDC).</p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Symbol
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.symbol}
+                  onChange={(e) => handleInputChange('symbol', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="MVLT"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Short ticker symbol for the vault token (e.g. vUSDC).</p>
+              </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
@@ -229,9 +281,22 @@ export default function NewVaultPage() {
                   required
                   value={formData.owner}
                   onChange={(e) => handleInputChange('owner', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  disabled={useConnectedWallet}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-500"
                   placeholder="0x..."
                 />
+                <div className="mt-2 flex items-center">
+                  <input
+                    type="checkbox"
+                    id="useConnectedWallet"
+                    checked={useConnectedWallet}
+                    onChange={(e) => handleUseConnectedWallet(e.target.checked)}
+                    className="h-4 w-4 text-primary rounded bg-white dark:bg-gray-700"
+                  />
+                  <label htmlFor="useConnectedWallet" className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                    Use Connected Wallet
+                  </label>
+                </div>
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Address with admin permissions for the vault.</p>
               </div>
 
@@ -244,9 +309,22 @@ export default function NewVaultPage() {
                   required
                   value={formData.treasury}
                   onChange={(e) => handleInputChange('treasury', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  disabled={treasurySameAsOwner}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-500"
                   placeholder="0x..."
                 />
+                <div className="mt-2 flex items-center">
+                  <input
+                    type="checkbox"
+                    id="treasurySameAsOwner"
+                    checked={treasurySameAsOwner}
+                    onChange={(e) => handleTreasurySameAsOwner(e.target.checked)}
+                    className="h-4 w-4 text-primary rounded bg-white dark:bg-gray-700"
+                  />
+                  <label htmlFor="treasurySameAsOwner" className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                    Same as Owner
+                  </label>
+                </div>
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Address that will receive performance fees generated by the vault.</p>
               </div>
             </div>
