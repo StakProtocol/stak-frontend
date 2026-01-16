@@ -6,13 +6,10 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            Launch Your DeFi Products
+            Launch your Flying ICO
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-2">
-            Create and manage Stak Vaults with ease.
-          </p>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-4">
-            Build the future of decentralized finance.
+            Use a Semi-redeemable vault to fund project upside without putting cash at risk
           </p>
         </div>
 
