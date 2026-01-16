@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { useChainId } from 'wagmi';
+import { useActiveWalletChain } from "thirdweb/react";
 
 import { ConnectButton, darkTheme } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
@@ -24,7 +24,7 @@ const customChain = defineChain({
 
 export function Navbar() {
   const pathname = usePathname();
-  const chainId = useChainId();
+  const activeChain = useActiveWalletChain();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigation = [
@@ -69,7 +69,7 @@ export function Navbar() {
 
           {/* Desktop Wallet Connect Button and Testnet Badge */}
           <div className="hidden md:flex md:items-center md:gap-4">
-            {chainId === 11155111 && (
+            {activeChain?.id === 11155111 && (
               <div className="px-4 py-1 dark:bg-primary/20 text-blue-800 dark:text-primary text-md font-medium rounded-full">
                 <span>Sepolia Testnet</span>
               </div>
