@@ -2,6 +2,7 @@ import { formatNumber } from '@/app/utils/helper';
 import { useState } from 'react';
 import { DivestModal } from './DivestModal';
 import { UnlockModal } from './UnlockModal';
+import { PositionDate } from './VaultDates';
 import { type Address } from 'viem';
 
 interface StakPosition {
@@ -62,9 +63,7 @@ export function PositionCard({ position, vaultAddress, vaultDecimals, vestingRat
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                         Position #{position.positionId}
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Created: {new Date(parseInt(position.createdAt) * 1000).toLocaleDateString()}
-                    </p>
+                    <PositionDate createdAt={position.createdAt} />
                 </div>
                 <div className="flex gap-2">
                     <button 

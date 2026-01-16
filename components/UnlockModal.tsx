@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 import { writeContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config } from '@/lib/wagmi';
-import { parseUnits, formatUnits, type Address } from 'viem';
+import { parseUnits, type Address } from 'viem';
 import StakVaultABI from '@/app/abis/StakVault.json';
-import { formatNumber } from '@/app/utils/helper';
 import { chainByID } from '@/app/utils/chains';
 import toast from 'react-hot-toast';
 
@@ -130,7 +129,7 @@ export function UnlockModal({
         <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600 dark:text-gray-400">Total Position Shares:</span>
-            <span className="font-medium text-gray-900 dark:text-white">{maxShares.toFixed(2)}</span>
+            <span className="font-medium text-gray-900 dark:text-white">{maxShares.toFixed(2)} {vaultSymbol}</span>
           </div>
         </div>
 
