@@ -29,8 +29,8 @@ export function VaultsList({ vaultsPromise }: { vaultsPromise: Promise<MinStakVa
                     <Link key={vault.id} href={`/vaults/${vault.id}`}>
                         <div className="bg-white dark:bg-dark-primary rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all border-2 border-gray-200 dark:border-gray-700 hover:border-primary">
                             <div className="flex items-start justify-between mb-4">
-                                <div>
-                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">{vault.name}</h3>
+                                <div className="w-6/7">
+                                    <h3 className="truncate text-xl font-bold text-gray-900 dark:text-white">{vault.name}</h3>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">{vault.symbol}</p>
                                 </div>
                                 <div className="w-8 h-8 rounded-lg flex items-center justify-center">

@@ -9,7 +9,10 @@ export default function Home() {
             Launch your Flying ICO
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-2">
-            Use a Semi-redeemable vault to fund project upside without putting cash at risk
+            Use a Semi-redeemable vault to fund project upside
+          </p>
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-2">
+            without putting cash at risk
           </p>
         </div>
 

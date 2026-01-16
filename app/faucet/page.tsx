@@ -1,7 +1,7 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { useAccount, useChainId } from 'wagmi';
 import { readContract, writeContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config } from '@/lib/wagmi';
 import { formatUnits, type Address } from 'viem';
@@ -10,6 +10,7 @@ import { getTokenPicture } from '@/app/utils/logos';
 import { chainByID } from '@/app/utils/chains';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
+import { useActiveAccount, useActiveWalletChain } from "thirdweb/react";
 
 const FAUCET_ADDRESS = '0x814456630e27aCcFbd165468bF4F09f8a90f2D2f' as Address;
 
@@ -67,9 +68,9 @@ const DEFAULT_TOKENS: TokenInfo[] = [
 ];
 
 export default function FaucetPage() {
-  const { address: userAddress, isConnected } = useAccount();
-  const chainId = useChainId();
-  const chain = chainByID(chainId);
+  const activeAccount = useActiveAccount();
+  const activeChain = useActiveWalletChain();
+  const chain = chainByID(activeChain?.id || 11155111);
   const [tokens, setTokens] = useState<TokenInfo[]>(DEFAULT_TOKENS);
   const [loading, setLoading] = useState(true);
   const [claiming, setClaiming] = useState<string | null>(null);
@@ -88,11 +89,6 @@ export default function FaucetPage() {
       // Start with default tokens
       setTokens(DEFAULT_TOKENS);
       setLoading(false);
-
-      // Try to update from contract if connected
-      if (!isConnected) {
-        return;
-      }
 
       try {
         const tokenData: TokenInfo[] = [];
@@ -142,10 +138,10 @@ export default function FaucetPage() {
     }
 
     loadTokenData();
-  }, [isConnected]);
+  }, []);
 
   const handleClaim = async (token: TokenInfo) => {
-    if (!isConnected || !userAddress) {
+    if (!activeAccount?.address) {
       toast.error('Please connect your wallet');
       return;
     }
@@ -246,7 +242,7 @@ export default function FaucetPage() {
           </div>
         ) : (
           <>
-            {!isConnected && (
+            {!activeAccount?.address && (
               <div className="mb-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
                 <p className="text-yellow-800 dark:text-yellow-200 text-sm">
                   ⚠️ Please connect your wallet to claim tokens
@@ -254,6 +250,56 @@ export default function FaucetPage() {
               </div>
             )}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div className="bg-white dark:bg-dark-primary/70 rounded-xl p-6 shadow-lg border-2 border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-primary/70 transition-all">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                    <Image
+                      src={getTokenPicture('sepolia', '0x0000000000000000000000000000000000000000')}
+                      alt="ETH"
+                      width={64}
+                      height={64}
+                      className="rounded-full"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                      ETH
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Native Token
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-3 mb-6">
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      Usage
+                    </p>
+                    <p className="text-sm font-mono text-gray-900 dark:text-white">
+                      Gas Fees
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      Source
+                    </p>
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">
+                      Alchemy
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  href="https://www.alchemy.com/faucets/ethereum-sepolia"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full px-4 py-3 bg-primary/50 hover:bg-primary/70 text-white rounded-lg font-medium transition-colors text-center"
+                >
+                  Get testnet ETH for gas
+                </Link>
+              </div>
+
               {tokens.map((token) => (
               <div
                 key={token.symbol}
@@ -286,6 +332,14 @@ export default function FaucetPage() {
                     </p>
                     <p className="text-sm font-mono text-gray-900 dark:text-white break-all">
                       {formatAddress(token.address)}
+                      <Link
+                        href={`${chain.blockExplorerUrl}/address/${token.address}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-2 text-sm text-primary/70 hover:underline"
+                      >
+                        View on Explorer
+                      </Link>
                     </p>
                   </div>
                   <div>
@@ -328,14 +382,14 @@ export default function FaucetPage() {
               <p className="text-sm font-mono text-gray-900 dark:text-white">
                 {formatAddress(FAUCET_ADDRESS)}
               </p>
-              <a
+              <Link
                 href={`${chain.blockExplorerUrl}/address/${FAUCET_ADDRESS}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-primary/70 hover:underline"
               >
                 View on Explorer
-              </a>
+              </Link>
             </div>
           </div>
         )}
@@ -343,4 +397,3 @@ export default function FaucetPage() {
     </div>
   );
 }
-
